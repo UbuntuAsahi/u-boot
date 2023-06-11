@@ -28,6 +28,7 @@
 *.o
 *.o.*
 *.order
+*.patch
 *.s
 *.su
 *.swp
@@ -71,8 +72,8 @@ patches-*
 .stgit-edit.txt
 
 # quilt's files
-# patches
-# series
+patches
+series
 
 # gdb files
 .gdb_history
