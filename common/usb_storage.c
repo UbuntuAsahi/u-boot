@@ -54,6 +54,12 @@
 #undef BBB_COMDAT_TRACE
 #undef BBB_XPORT_TRACE
 
+/*
+ * Timeout for read/write transfers. This needs to be able to handle very slow
+ * devices, such as hard disks that are spinning up.
+ */
+#define US_XFER_TIMEOUT 15000
+
 #include <scsi.h>
 /* direction table -- this indicates the direction of the data
  * transfer for each command code -- a 1 indicates input
@@ -61,7 +67,7 @@
 static const unsigned char us_direction[256/8] = {
 	0x28, 0x81, 0x14, 0x14, 0x20, 0x01, 0x90, 0x77,
 	0x0C, 0x20, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01,
+	0x00, 0x01, 0x00, 0x40, 0x00, 0x01, 0x00, 0x01,
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 #define US_DIRECTION(x) ((us_direction[x>>3] >> (x & 7)) & 1)
@@ -102,6 +108,7 @@ struct us_data {
 	trans_reset	transport_reset;	/* reset routine */
 	trans_cmnd	transport;		/* transport routine */
 	unsigned short	max_xfer_blk;		/* maximum transfer blocks */
+	bool		cmd12;			/* use 12-byte commands (RBC/UFI) */
 };
 
 #if !CONFIG_IS_ENABLED(BLK)
@@ -359,7 +366,7 @@ static void usb_show_srb(struct scsi_cmd *pccb)
 {
 	int i;
 	printf("SRB: len %d datalen 0x%lX\n ", pccb->cmdlen, pccb->datalen);
-	for (i = 0; i < 12; i++)
+	for (i = 0; i < pccb->cmdlen; i++)
 		printf("%02X ", pccb->cmd[i]);
 	printf("\n");
 }
@@ -410,7 +417,7 @@ static int us_one_transfer(struct us_data *us, int pipe, char *buf, int length)
 			      11 - maxtry);
 			result = usb_bulk_msg(us->pusb_dev, pipe, buf,
 					      this_xfer, &partial,
-					      USB_CNTL_TIMEOUT * 5);
+					      US_XFER_TIMEOUT);
 			debug("bulk_msg returned %d xferred %d/%d\n",
 			      result, partial, this_xfer);
 			if (us->pusb_dev->status != 0) {
@@ -711,15 +718,6 @@ static int usb_stor_CBI_get_status(struct scsi_cmd *srb, struct us_data *us)
 #define USB_TRANSPORT_UNKNOWN_RETRY 5
 #define USB_TRANSPORT_NOT_READY_RETRY 10
 
-/* clear a stall on an endpoint - special for BBB devices */
-static int usb_stor_BBB_clear_endpt_stall(struct us_data *us, __u8 endpt)
-{
-	/* ENDPOINT_HALT = 0, so set value to 0 */
-	return usb_control_msg(us->pusb_dev, usb_sndctrlpipe(us->pusb_dev, 0),
-			       USB_REQ_CLEAR_FEATURE, USB_RECIP_ENDPOINT, 0,
-			       endpt, NULL, 0, USB_CNTL_TIMEOUT * 5);
-}
-
 static int usb_stor_BBB_transport(struct scsi_cmd *srb, struct us_data *us)
 {
 	int result, retry;
@@ -759,13 +757,12 @@ static int usb_stor_BBB_transport(struct scsi_cmd *srb, struct us_data *us)
 		pipe = pipeout;
 
 	result = usb_bulk_msg(us->pusb_dev, pipe, srb->pdata, srb->datalen,
-			      &data_actlen, USB_CNTL_TIMEOUT * 5);
+			      &data_actlen, US_XFER_TIMEOUT);
 	/* special handling of STALL in DATA phase */
 	if ((result < 0) && (us->pusb_dev->status & USB_ST_STALLED)) {
 		debug("DATA:stall\n");
 		/* clear the STALL on the endpoint */
-		result = usb_stor_BBB_clear_endpt_stall(us,
-					dir_in ? us->ep_in : us->ep_out);
+		result = usb_clear_halt(us->pusb_dev, pipe);
 		if (result >= 0)
 			/* continue on to STATUS phase */
 			goto st;
@@ -794,7 +791,7 @@ again:
 	    (us->pusb_dev->status & USB_ST_STALLED)) {
 		debug("STATUS:stall\n");
 		/* clear the STALL on the endpoint */
-		result = usb_stor_BBB_clear_endpt_stall(us, us->ep_in);
+		result = usb_clear_halt(us->pusb_dev, pipein);
 		if (result >= 0 && (retry++ < 1))
 			/* do a retry */
 			goto again;
@@ -898,7 +895,7 @@ do_retry:
 	psrb->cmd[4] = 18;
 	psrb->datalen = 18;
 	psrb->pdata = &srb->sense_buf[0];
-	psrb->cmdlen = 12;
+	psrb->cmdlen = us->cmd12 ? 12 : 6;
 	/* issue the command */
 	result = usb_stor_CB_comdat(psrb, us);
 	debug("auto request returned %d\n", result);
@@ -999,7 +996,7 @@ static int usb_inquiry(struct scsi_cmd *srb, struct us_data *ss)
 		srb->cmd[1] = srb->lun << 5;
 		srb->cmd[4] = 36;
 		srb->datalen = 36;
-		srb->cmdlen = 12;
+		srb->cmdlen = ss->cmd12 ? 12 : 6;
 		i = ss->transport(srb, ss);
 		debug("inquiry returns %d\n", i);
 		if (i == 0)
@@ -1024,7 +1021,7 @@ static int usb_request_sense(struct scsi_cmd *srb, struct us_data *ss)
 	srb->cmd[4] = 18;
 	srb->datalen = 18;
 	srb->pdata = &srb->sense_buf[0];
-	srb->cmdlen = 12;
+	srb->cmdlen = ss->cmd12 ? 12 : 6;
 	ss->transport(srb, ss);
 	debug("Request Sense returned %02X %02X %02X\n",
 	      srb->sense_buf[2], srb->sense_buf[12],
@@ -1042,7 +1039,7 @@ static int usb_test_unit_ready(struct scsi_cmd *srb, struct us_data *ss)
 		srb->cmd[0] = SCSI_TST_U_RDY;
 		srb->cmd[1] = srb->lun << 5;
 		srb->datalen = 0;
-		srb->cmdlen = 12;
+		srb->cmdlen = ss->cmd12 ? 12 : 6;
 		if (ss->transport(srb, ss) == USB_STOR_TRANSPORT_GOOD) {
 			ss->flags |= USB_READY;
 			return 0;
@@ -1074,13 +1071,34 @@ static int usb_read_capacity(struct scsi_cmd *srb, struct us_data *ss)
 		srb->cmd[0] = SCSI_RD_CAPAC;
 		srb->cmd[1] = srb->lun << 5;
 		srb->datalen = 8;
-		srb->cmdlen = 12;
+		srb->cmdlen = ss->cmd12 ? 12 : 10;
 		if (ss->transport(srb, ss) == USB_STOR_TRANSPORT_GOOD)
 			return 0;
 	} while (retry--);
 
 	return -1;
 }
+
+#ifdef CONFIG_SYS_64BIT_LBA
+static int usb_read_capacity64(struct scsi_cmd *srb, struct us_data *ss)
+{
+	int retry;
+	/* XXX retries */
+	retry = 3;
+	do {
+		memset(&srb->cmd[0], 0, 16);
+		srb->cmd[0] = SCSI_SRV_ACTION_IN;
+		srb->cmd[1] = (srb->lun << 5) | SCSI_SAI_RD_CAPAC16;
+		srb->cmd[13] = 32; /* Allocation length */
+		srb->datalen = 32;
+		srb->cmdlen = 16;
+		if (ss->transport(srb, ss) == USB_STOR_TRANSPORT_GOOD)
+			return 0;
+	} while (retry--);
+
+	return -1;
+}
+#endif
 
 static int usb_read_10(struct scsi_cmd *srb, struct us_data *ss,
 		       unsigned long start, unsigned short blocks)
@@ -1094,7 +1112,7 @@ static int usb_read_10(struct scsi_cmd *srb, struct us_data *ss,
 	srb->cmd[5] = ((unsigned char) (start)) & 0xff;
 	srb->cmd[7] = ((unsigned char) (blocks >> 8)) & 0xff;
 	srb->cmd[8] = (unsigned char) blocks & 0xff;
-	srb->cmdlen = 12;
+	srb->cmdlen = ss->cmd12 ? 12 : 10;
 	debug("read10: start %lx blocks %x\n", start, blocks);
 	return ss->transport(srb, ss);
 }
@@ -1111,11 +1129,54 @@ static int usb_write_10(struct scsi_cmd *srb, struct us_data *ss,
 	srb->cmd[5] = ((unsigned char) (start)) & 0xff;
 	srb->cmd[7] = ((unsigned char) (blocks >> 8)) & 0xff;
 	srb->cmd[8] = (unsigned char) blocks & 0xff;
-	srb->cmdlen = 12;
+	srb->cmdlen = ss->cmd12 ? 12 : 10;
 	debug("write10: start %lx blocks %x\n", start, blocks);
 	return ss->transport(srb, ss);
 }
 
+#ifdef CONFIG_SYS_64BIT_LBA
+static int usb_read_16(struct scsi_cmd *srb, struct us_data *ss,
+		       uint64_t start, unsigned short blocks)
+{
+	memset(&srb->cmd[0], 0, 16);
+	srb->cmd[0] = SCSI_READ16;
+	srb->cmd[1] = srb->lun << 5;
+	srb->cmd[2] = ((unsigned char) (start >> 56)) & 0xff;
+	srb->cmd[3] = ((unsigned char) (start >> 48)) & 0xff;
+	srb->cmd[4] = ((unsigned char) (start >> 40)) & 0xff;
+	srb->cmd[5] = ((unsigned char) (start >> 32)) & 0xff;
+	srb->cmd[6] = ((unsigned char) (start >> 24)) & 0xff;
+	srb->cmd[7] = ((unsigned char) (start >> 16)) & 0xff;
+	srb->cmd[8] = ((unsigned char) (start >> 8)) & 0xff;
+	srb->cmd[9] = ((unsigned char) (start)) & 0xff;
+	srb->cmd[12] = ((unsigned char) (blocks >> 8)) & 0xff;
+	srb->cmd[13] = (unsigned char) blocks & 0xff;
+	srb->cmdlen = 16;
+	debug("read16: start %llx blocks %x\n", (long long)start, blocks);
+	return ss->transport(srb, ss);
+}
+
+static int usb_write_16(struct scsi_cmd *srb, struct us_data *ss,
+			uint64_t start, unsigned short blocks)
+{
+	memset(&srb->cmd[0], 0, 16);
+	srb->cmd[0] = SCSI_WRITE16;
+	srb->cmd[1] = srb->lun << 5;
+	srb->cmd[2] = ((unsigned char) (start >> 56)) & 0xff;
+	srb->cmd[3] = ((unsigned char) (start >> 48)) & 0xff;
+	srb->cmd[4] = ((unsigned char) (start >> 40)) & 0xff;
+	srb->cmd[5] = ((unsigned char) (start >> 32)) & 0xff;
+	srb->cmd[6] = ((unsigned char) (start >> 24)) & 0xff;
+	srb->cmd[7] = ((unsigned char) (start >> 16)) & 0xff;
+	srb->cmd[8] = ((unsigned char) (start >> 8)) & 0xff;
+	srb->cmd[9] = ((unsigned char) (start)) & 0xff;
+	srb->cmd[12] = ((unsigned char) (blocks >> 8)) & 0xff;
+	srb->cmd[13] = (unsigned char) blocks & 0xff;
+	srb->cmdlen = 16;
+	debug("write16: start %llx blocks %x\n", (long long)start, blocks);
+	return ss->transport(srb, ss);
+}
+#endif
 
 #ifdef CONFIG_USB_BIN_FIXUP
 /*
@@ -1154,6 +1215,7 @@ static unsigned long usb_stor_read(struct blk_desc *block_dev, lbaint_t blknr,
 	struct usb_device *udev;
 	struct us_data *ss;
 	int retry;
+	int ret;
 	struct scsi_cmd *srb = &usb_ccb;
 #if CONFIG_IS_ENABLED(BLK)
 	struct blk_desc *block_dev;
@@ -1199,7 +1261,13 @@ retry_it:
 			usb_show_progress();
 		srb->datalen = block_dev->blksz * smallblks;
 		srb->pdata = (unsigned char *)buf_addr;
-		if (usb_read_10(srb, ss, start, smallblks)) {
+#ifdef CONFIG_SYS_64BIT_LBA
+		if (block_dev->lba > ((lbaint_t)0x100000000))
+			ret = usb_read_16(srb, ss, start, smallblks);
+		else
+#endif
+		ret = usb_read_10(srb, ss, start, smallblks);
+		if (ret) {
 			debug("Read ERROR\n");
 			ss->flags &= ~USB_READY;
 			usb_request_sense(srb, ss);
@@ -1237,6 +1305,7 @@ static unsigned long usb_stor_write(struct blk_desc *block_dev, lbaint_t blknr,
 	struct usb_device *udev;
 	struct us_data *ss;
 	int retry;
+	int ret;
 	struct scsi_cmd *srb = &usb_ccb;
 #if CONFIG_IS_ENABLED(BLK)
 	struct blk_desc *block_dev;
@@ -1286,7 +1355,13 @@ retry_it:
 			usb_show_progress();
 		srb->datalen = block_dev->blksz * smallblks;
 		srb->pdata = (unsigned char *)buf_addr;
-		if (usb_write_10(srb, ss, start, smallblks)) {
+#ifdef CONFIG_SYS_64BIT_LBA
+		if (block_dev->lba > ((lbaint_t)0x100000000))
+			ret = usb_write_16(srb, ss, start, smallblks);
+		else
+#endif
+		ret = usb_write_10(srb, ss, start, smallblks);
+		if (ret) {
 			debug("Write ERROR\n");
 			ss->flags &= ~USB_READY;
 			usb_request_sense(srb, ss);
@@ -1417,6 +1492,11 @@ int usb_storage_probe(struct usb_device *dev, unsigned int ifnum,
 		printf("Sorry, protocol %d not yet supported.\n", ss->subclass);
 		return 0;
 	}
+
+	/* UFI uses 12-byte commands (like RBC, unlike SCSI) */
+	if (ss->subclass == US_SC_UFI)
+		ss->cmd12 = true;
+
 	if (ss->ep_int) {
 		/* we had found an interrupt endpoint, prepare irq pipe
 		 * set up the IRQ pipe and handler
@@ -1438,9 +1518,10 @@ int usb_stor_get_info(struct usb_device *dev, struct us_data *ss,
 		      struct blk_desc *dev_desc)
 {
 	unsigned char perq, modi;
-	ALLOC_CACHE_ALIGN_BUFFER(u32, cap, 2);
+	ALLOC_CACHE_ALIGN_BUFFER(u32, cap, 8);
 	ALLOC_CACHE_ALIGN_BUFFER(u8, usb_stor_buf, 36);
-	u32 capacity, blksz;
+	lbaint_t capacity;
+	u32 blksz;
 	struct scsi_cmd *pccb = &usb_ccb;
 
 	pccb->pdata = usb_stor_buf;
@@ -1491,26 +1572,43 @@ int usb_stor_get_info(struct usb_device *dev, struct us_data *ss,
 		return 0;
 	}
 	pccb->pdata = (unsigned char *)cap;
-	memset(pccb->pdata, 0, 8);
+	memset(pccb->pdata, 0, 32);
 	if (usb_read_capacity(pccb, ss) != 0) {
-		printf("READ_CAP ERROR\n");
+		puts("READ_CAP ERROR\n");
 		ss->flags &= ~USB_READY;
-		cap[0] = 2880;
-		cap[1] = 0x200;
+		capacity = 2880;
+		blksz = 512;
+	} else {
+		debug("Read Capacity returns: 0x%08x, 0x%08x\n",
+		      cap[0], cap[1]);
+		capacity = ((lbaint_t)be32_to_cpu(cap[0])) + 1;
+		blksz = be32_to_cpu(cap[1]);
 	}
-	debug("Read Capacity returns: 0x%08x, 0x%08x\n", cap[0], cap[1]);
-#if 0
-	if (cap[0] > (0x200000 * 10)) /* greater than 10 GByte */
-		cap[0] >>= 16;
 
-	cap[0] = cpu_to_be32(cap[0]);
-	cap[1] = cpu_to_be32(cap[1]);
+#ifdef CONFIG_SYS_64BIT_LBA
+	if (capacity == 0x100000000) {
+		if (usb_read_capacity64(pccb, ss) != 0) {
+			puts("READ_CAP64 ERROR\n");
+		} else {
+			debug("Read Capacity 64 returns: 0x%08x, 0x%08x, 0x%08x\n",
+			      cap[0], cap[1], cap[2]);
+			capacity = be64_to_cpu(*(uint64_t *)cap) + 1;
+			blksz = be32_to_cpu(cap[2]);
+		}
+	}
+#else
+	/*
+	 * READ CAPACITY will return 0xffffffff when limited,
+	 * which wraps to 0 with the +1 above
+	 */
+	if (!capacity) {
+		puts("LBA exceeds 32 bits but 64-bit LBA is disabled.\n");
+		capacity = ~0;
+	}
 #endif
 
-	capacity = be32_to_cpu(cap[0]) + 1;
-	blksz = be32_to_cpu(cap[1]);
-
-	debug("Capacity = 0x%08x, blocksz = 0x%08x\n", capacity, blksz);
+	debug("Capacity = 0x%llx, blocksz = 0x%08x\n",
+	      (long long)capacity, blksz);
 	dev_desc->lba = capacity;
 	dev_desc->blksz = blksz;
 	dev_desc->log2blksz = LOG2(dev_desc->blksz);
