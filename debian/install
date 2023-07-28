@@ -1,0 +1,4 @@
+u-boot.bin		usr/lin/u-boot-asahi
+u-boot-nodtb.bin	usr/lib/u-boot-asahi
+u-boot-nodtb.bin	usr/lib/u-boot-asahi
+arch/arm/dts/*.dtb	usr/lib/u-boot-asahi/dts
