@@ -62,9 +62,10 @@ struct blk_desc {
 	unsigned char	hwpart;		/* HW partition, e.g. for eMMC */
 	unsigned char	type;		/* device type */
 	unsigned char	removable;	/* removable device */
+#ifdef CONFIG_LBA48
 	/* device can use 48bit addr (ATA/ATAPI v7) */
-	bool	lba48;
-	unsigned char	atapi;		/* Use ATAPI protocol */
+	unsigned char	lba48;
+#endif
 	lbaint_t	lba;		/* number of blocks */
 	unsigned long	blksz;		/* block size */
 	int		log2blksz;	/* for convenience: log2(blksz) */

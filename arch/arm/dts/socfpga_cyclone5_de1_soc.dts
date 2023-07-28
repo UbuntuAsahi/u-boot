@@ -67,7 +67,7 @@
 
 &mmc0 {
 	status = "okay";
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &usb1 {
@@ -76,7 +76,7 @@
 
 &uart0 {
 	clock-frequency = <100000000>;
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &watchdog0 {

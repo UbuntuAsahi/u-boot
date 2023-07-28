@@ -32,26 +32,26 @@
 };
 
 &cbass_main{
-	bootph-pre-ram;
+	u-boot,dm-spl;
 
 	main_navss: bus@30000000 {
-		bootph-pre-ram;
+		u-boot,dm-spl;
 	};
 };
 
 &cbass_mcu_wakeup {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 
 	timer1: timer@40400000 {
 		compatible = "ti,omap5430-timer";
 		reg = <0x0 0x40400000 0x0 0x80>;
 		ti,timer-alwon;
 		clock-frequency = <250000000>;
-		bootph-pre-ram;
+		u-boot,dm-spl;
 	};
 
 	mcu_navss: bus@28380000 {
-		bootph-pre-ram;
+		u-boot,dm-spl;
 
 		ringacc@2b800000 {
 			reg =	<0x0 0x2b800000 0x0 0x400000>,
@@ -60,7 +60,7 @@
 				<0x0 0x2a500000 0x0 0x40000>,
 				<0x0 0x28440000 0x0 0x40000>;
 			reg-names = "rt", "fifos", "proxy_gcfg", "proxy_target", "cfg";
-			bootph-pre-ram;
+			u-boot,dm-spl;
 		};
 
 		dma-controller@285c0000 {
@@ -72,61 +72,61 @@
 				<0x0 0x28400000 0x0 0x2000>;
 			reg-names = "gcfg", "rchan", "rchanrt", "tchan",
 					    "tchanrt", "rflow";
-			bootph-pre-ram;
+			u-boot,dm-spl;
 		};
 	};
 
 	chipid@43000014 {
-		bootph-pre-ram;
+		u-boot,dm-spl;
 	};
 };
 
 &secure_proxy_main {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &dmsc {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 	k3_sysreset: sysreset-controller {
 		compatible = "ti,sci-sysreset";
-		bootph-pre-ram;
+		u-boot,dm-spl;
 	};
 };
 
 &k3_pds {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &k3_clks {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &k3_reset {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &wkup_pmx0 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &main_pmx0 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &main_uart0 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &mcu_uart0 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &main_sdhci0 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &main_sdhci1 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &wiz3_pll1_refclk {
@@ -135,16 +135,16 @@
 };
 
 &main_usbss0_pins_default {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &usbss0 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &usb0 {
 	dr_mode = "peripheral";
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &mcu_cpsw {
@@ -161,79 +161,79 @@
 };
 
 &main_mmc1_pins_default {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &wkup_i2c0_pins_default {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &wkup_i2c0 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &main_i2c0 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &main_i2c0_pins_default {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &exp2 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &mcu_fss0_ospi0_pins_default {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &fss {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &hbmc {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 
 	flash@0,0 {
-		bootph-pre-ram;
+		u-boot,dm-spl;
 	};
 };
 
 &hbmc_mux {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &wkup_gpio0 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &ospi0 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 
 	flash@0 {
-		bootph-pre-ram;
+		u-boot,dm-spl;
 	};
 };
 
 &ospi1 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 
 	flash@0 {
-		bootph-pre-ram;
+		u-boot,dm-spl;
 	};
 };
 
 &mcu_fss0_hpb0_pins_default {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &wkup_gpio_pins_default {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &mcu_fss0_ospi1_pins_default {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &main_r5fss0 {

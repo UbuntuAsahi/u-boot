@@ -1,5 +1,5 @@
 &lcd0 {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 #include "mvebu-u-boot.dtsi"

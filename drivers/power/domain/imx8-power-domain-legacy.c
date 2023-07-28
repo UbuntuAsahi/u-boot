@@ -14,7 +14,7 @@
 #include <dm/device-internal.h>
 #include <dm/device.h>
 #include <dm/uclass-internal.h>
-#include <firmware/imx/sci/sci.h>
+#include <asm/arch/sci/sci.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 

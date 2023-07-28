@@ -5,7 +5,7 @@
 
 from binman.entry import Entry
 from dtoc import fdt_util
-from u_boot_pylib import tools
+from patman import tools
 
 class Entry_null(Entry):
     """An entry which has no contents of its own

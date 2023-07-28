@@ -599,12 +599,7 @@ int main(int argc, char **argv)
 		exit (retval);
 	}
 
-	if (!params.skipcpy && params.type != IH_TYPE_MULTI && params.type != IH_TYPE_SCRIPT) {
-		if (!params.datafile) {
-			fprintf(stderr, "%s: Option -d with image data file was not specified\n",
-				params.cmdname);
-			exit(EXIT_FAILURE);
-		}
+	if ((params.type != IH_TYPE_MULTI) && (params.type != IH_TYPE_SCRIPT)) {
 		dfd = open(params.datafile, O_RDONLY | O_BINARY);
 		if (dfd < 0) {
 			fprintf(stderr, "%s: Can't open %s: %s\n",
@@ -790,7 +785,7 @@ int main(int argc, char **argv)
 
 	/* Print the image information by processing image header */
 	if (tparams->print_header)
-		tparams->print_header (ptr, &params);
+		tparams->print_header (ptr);
 	else {
 		fprintf (stderr, "%s: Can't print header for %s\n",
 			params.cmdname, tparams->name);
@@ -865,9 +860,7 @@ copy_file (int ifd, const char *datafile, int pad)
 		exit (EXIT_FAILURE);
 	}
 
-	if (params.xflag &&
-	    (((params.type > IH_TYPE_INVALID) && (params.type < IH_TYPE_FLATDT)) ||
-	     (params.type == IH_TYPE_KERNEL_NOLOAD) || (params.type == IH_TYPE_FIRMWARE_IVT))) {
+	if (params.xflag) {
 		unsigned char *p = NULL;
 		/*
 		 * XIP: do not append the struct legacy_img_hdr at the

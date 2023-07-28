@@ -3,11 +3,6 @@
 #
 
 import multiprocessing
-try:
-    import importlib.resources
-except ImportError:
-    # for Python 3.6
-    import importlib_resources
 import os
 import shutil
 import subprocess
@@ -18,12 +13,12 @@ from buildman import bsettings
 from buildman import cfgutil
 from buildman import toolchain
 from buildman.builder import Builder
+from patman import command
 from patman import gitutil
 from patman import patchstream
-from u_boot_pylib import command
-from u_boot_pylib import terminal
-from u_boot_pylib import tools
-from u_boot_pylib.terminal import tprint
+from patman import terminal
+from patman import tools
+from patman.terminal import tprint
 
 def GetPlural(count):
     """Returns a plural 's' if count is not 1"""
@@ -157,8 +152,9 @@ def DoBuildman(options, args, toolchains=None, make_func=None, brds=None,
     global builder
 
     if options.full_help:
-        with importlib.resources.path('buildman', 'README.rst') as readme:
-            tools.print_full_help(str(readme))
+        tools.print_full_help(
+            os.path.join(os.path.dirname(os.path.realpath(sys.argv[0])),
+                         'README.rst'))
         return 0
 
     gitutil.setup()
@@ -265,9 +261,9 @@ def DoBuildman(options, args, toolchains=None, make_func=None, brds=None,
             count += 1   # Build upstream commit also
 
     if not count:
-        msg = ("No commits found to process in branch '%s': "
+        str = ("No commits found to process in branch '%s': "
                "set branch's upstream or use -c flag" % options.branch)
-        sys.exit(col.build(col.RED, msg))
+        sys.exit(col.build(col.RED, str))
     if options.work_in_output:
         if len(selected) != 1:
             sys.exit(col.build(col.RED,
@@ -342,14 +338,6 @@ def DoBuildman(options, args, toolchains=None, make_func=None, brds=None,
             shutil.rmtree(output_dir)
     adjust_cfg = cfgutil.convert_list_to_dict(options.adjust_cfg)
 
-    # Drop LOCALVERSION_AUTO since it changes the version string on every commit
-    if options.reproducible_builds:
-        # If these are mentioned, leave the local version alone
-        if 'LOCALVERSION' in adjust_cfg or 'LOCALVERSION_AUTO' in adjust_cfg:
-            print('Not dropping LOCALVERSION_AUTO for reproducible build')
-        else:
-            adjust_cfg['LOCALVERSION_AUTO'] = '~'
-
     builder = Builder(toolchains, output_dir, options.git_dir,
             options.threads, options.jobs, gnu_make=gnu_make, checkout=True,
             show_unknown=options.show_unknown, step=options.step,
@@ -363,8 +351,7 @@ def DoBuildman(options, args, toolchains=None, make_func=None, brds=None,
             work_in_output=options.work_in_output,
             test_thread_exceptions=test_thread_exceptions,
             adjust_cfg=adjust_cfg,
-            allow_missing=allow_missing, no_lto=options.no_lto,
-            reproducible_builds=options.reproducible_builds)
+            allow_missing=allow_missing)
     builder.force_config_on_failure = not options.quick
     if make_func:
         builder.do_make = make_func

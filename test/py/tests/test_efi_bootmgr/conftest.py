@@ -1,6 +1,7 @@
 # SPDX-License-Identifier:      GPL-2.0+
 
-"""Fixture for UEFI bootmanager test."""
+"""Fixture for UEFI bootmanager test
+"""
 
 import os
 import shutil
@@ -9,7 +10,8 @@ import pytest
 
 @pytest.fixture(scope='session')
 def efi_bootmgr_data(u_boot_config):
-    """Set up a file system to be used in UEFI bootmanager tests.
+    """Set up a file system to be used in UEFI bootmanager
+       tests
 
     Args:
         u_boot_config -- U-boot configuration.

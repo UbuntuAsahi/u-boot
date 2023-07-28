@@ -17,7 +17,7 @@
 
 	dmc: dmc {
 		compatible = "rockchip,rk3568-dmc";
-		bootph-all;
+		u-boot,dm-pre-reloc;
 		status = "okay";
 	};
 
@@ -34,48 +34,32 @@
 	};
 };
 
-&xin24m {
-	bootph-all;
-	status = "okay";
-};
-
 &cru {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 	status = "okay";
 };
 
 &pmucru {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 	status = "okay";
 };
 
 &grf {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 	status = "okay";
 };
 
 &pmugrf {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 	status = "okay";
 };
 
 &sdhci {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 	status = "okay";
 };
 
 &sdmmc0 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 	status = "okay";
 };
-
-#ifdef CONFIG_ROCKCHIP_SPI_IMAGE
-&binman {
-	simple-bin-spi {
-		mkimage {
-			args = "-n", CONFIG_SYS_SOC, "-T", "rksd";
-			offset = <0x8000>;
-		};
-	};
-};
-#endif

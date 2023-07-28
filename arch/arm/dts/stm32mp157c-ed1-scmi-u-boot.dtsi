@@ -29,16 +29,16 @@
 };
 
 &uart4 {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &uart4_pins_a {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 	pins1 {
-		bootph-all;
+		u-boot,dm-pre-reloc;
 	};
 	pins2 {
-		bootph-all;
+		u-boot,dm-pre-reloc;
 		/* pull-up on rx to avoid floating level */
 		bias-pull-up;
 	};

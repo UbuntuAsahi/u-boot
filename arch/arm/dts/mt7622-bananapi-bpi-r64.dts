@@ -177,7 +177,7 @@
 	spi-flash@0{
 		compatible = "jedec,spi-nor";
 		reg = <0>;
-		bootph-all;
+		u-boot,dm-pre-reloc;
 	};
 };
 

@@ -13,7 +13,6 @@
 #include <command.h>
 #include <console.h>
 #include <env.h>
-#include <fdtdec.h>
 #include <init.h>
 #include <net.h>
 #include <version_string.h>

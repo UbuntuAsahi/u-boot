@@ -6,65 +6,65 @@
 #include "imx8mn-u-boot.dtsi"
 
 &gpio1 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &gpio2 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &gpio3 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &gpio4 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &gpio5 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &uart2 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &pinctrl_uart2 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &usdhc3 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &pinctrl_usdhc3 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &i2c1 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &pinctrl_i2c1 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &pinctrl_i2c1_gpio {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &gsc {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &i2c2 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &pinctrl_i2c2 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &pinctrl_wdog {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };

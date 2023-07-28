@@ -43,7 +43,7 @@
 #define USB_BUFSIZ	512
 
 static int asynch_allowed;
-bool usb_started; /* flag for the started/stopped USB status */
+char usb_started; /* flag for the started/stopped USB status */
 
 #if !CONFIG_IS_ENABLED(DM_USB)
 static struct usb_device usb_dev[USB_MAX_DEVICE];
@@ -241,22 +241,10 @@ int usb_control_msg(struct usb_device *dev, unsigned int pipe,
 	      request, requesttype, value, index, size);
 	dev->status = USB_ST_NOT_PROC; /*not yet processed */
 
-	err = submit_control_msg(dev, pipe, data, size, setup_packet);
+	err = submit_control_msg(dev, pipe, data, size, setup_packet, timeout);
 	if (err < 0)
 		return err;
-	if (timeout == 0)
-		return (int)size;
 
-	/*
-	 * Wait for status to update until timeout expires, USB driver
-	 * interrupt handler may set the status when the USB operation has
-	 * been completed.
-	 */
-	while (timeout--) {
-		if (!((volatile unsigned long)dev->status & USB_ST_NOT_PROC))
-			break;
-		mdelay(1);
-	}
 	if (dev->status)
 		return -1;
 
@@ -275,13 +263,8 @@ int usb_bulk_msg(struct usb_device *dev, unsigned int pipe,
 	if (len < 0)
 		return -EINVAL;
 	dev->status = USB_ST_NOT_PROC; /*not yet processed */
-	if (submit_bulk_msg(dev, pipe, data, len) < 0)
+	if (submit_bulk_msg(dev, pipe, data, len, timeout) < 0)
 		return -EIO;
-	while (timeout--) {
-		if (!((volatile unsigned long)dev->status & USB_ST_NOT_PROC))
-			break;
-		mdelay(1);
-	}
 	*actual_length = dev->act_len;
 	if (dev->status == 0)
 		return 0;
@@ -457,6 +440,15 @@ static int usb_parse_config(struct usb_device *dev,
 			}
 			if (ifno < 0) {
 				puts("Endpoint descriptor out of order!\n");
+				break;
+			}
+			if (if_desc->num_altsetting > 1) {
+				/*
+				 * Ignore altsettings, which can trigger duplicate
+				 * endpoint errors below. Revisit this when some
+				 * driver actually needs altsettings with differing
+				 * endpoint setups.
+				 */
 				break;
 			}
 			epno = dev->config.if_desc[ifno].no_of_ep;

@@ -369,23 +369,22 @@ static bool tmio_sd_addr_is_dmaable(struct mmc_data *data)
 	if (!IS_ALIGNED(addr, TMIO_SD_DMA_MINALIGN))
 		return false;
 
-	if (IS_ENABLED(CONFIG_RCAR_64)) {
-		if (!(data->flags & MMC_DATA_READ) && !IS_ALIGNED(addr, 128))
-			return false;
-		/* Gen3 DMA has 32bit limit */
-		if (sizeof(addr) > 4 && addr >> 32)
-			return false;
-	}
+#if defined(CONFIG_RCAR_GEN3)
+	if (!(data->flags & MMC_DATA_READ) && !IS_ALIGNED(addr, 128))
+		return false;
+	/* Gen3 DMA has 32bit limit */
+	if (addr >> 32)
+		return false;
+#endif
 
-#ifdef CONFIG_SPL_BUILD
-	if (IS_ENABLED(CONFIG_ARCH_UNIPHIER) && !IS_ENABLED(CONFIG_ARM64)) {
-		/*
-		 * For UniPhier ARMv7 SoCs, the stack is allocated in locked
-		 * ways of L2, which is unreachable from the DMA engine.
-		 */
-		if (addr < CONFIG_SPL_STACK)
-			return false;
-	}
+#if defined(CONFIG_ARCH_UNIPHIER) && !defined(CONFIG_ARM64) && \
+	defined(CONFIG_SPL_BUILD)
+	/*
+	 * For UniPhier ARMv7 SoCs, the stack is allocated in the locked ways
+	 * of L2, which is unreachable from the DMA engine.
+	 */
+	if (addr < CONFIG_SPL_STACK)
+		return false;
 #endif
 
 	return true;
@@ -623,22 +622,25 @@ static void tmio_sd_set_clk_rate(struct tmio_sd_priv *priv, struct mmc *mmc)
 static void tmio_sd_set_pins(struct udevice *dev)
 {
 	__maybe_unused struct mmc *mmc = mmc_get_mmc_dev(dev);
+
+#ifdef CONFIG_DM_REGULATOR
 	struct tmio_sd_priv *priv = dev_get_priv(dev);
 
-	if (CONFIG_IS_ENABLED(DM_REGULATOR) && priv->vqmmc_dev) {
+	if (priv->vqmmc_dev) {
 		if (mmc->signal_voltage == MMC_SIGNAL_VOLTAGE_180)
 			regulator_set_value(priv->vqmmc_dev, 1800000);
 		else
 			regulator_set_value(priv->vqmmc_dev, 3300000);
 		regulator_set_enable(priv->vqmmc_dev, true);
 	}
+#endif
 
-	if (CONFIG_IS_ENABLED(PINCTRL)) {
-		if (mmc->signal_voltage == MMC_SIGNAL_VOLTAGE_180)
-			pinctrl_select_state(dev, "state_uhs");
-		else
-			pinctrl_select_state(dev, "default");
-	}
+#ifdef CONFIG_PINCTRL
+	if (mmc->signal_voltage == MMC_SIGNAL_VOLTAGE_180)
+		pinctrl_select_state(dev, "state_uhs");
+	else
+		pinctrl_select_state(dev, "default");
+#endif
 }
 
 int tmio_sd_set_ios(struct udevice *dev)
@@ -732,12 +734,11 @@ int tmio_sd_probe(struct udevice *dev, u32 quirks)
 	if (!priv->regbase)
 		return -ENOMEM;
 
-	if (CONFIG_IS_ENABLED(DM_REGULATOR)) {
-		device_get_supply_regulator(dev, "vqmmc-supply",
-					    &priv->vqmmc_dev);
-		if (priv->vqmmc_dev)
-			regulator_set_value(priv->vqmmc_dev, 3300000);
-	}
+#ifdef CONFIG_DM_REGULATOR
+	device_get_supply_regulator(dev, "vqmmc-supply", &priv->vqmmc_dev);
+	if (priv->vqmmc_dev)
+		regulator_set_value(priv->vqmmc_dev, 3300000);
+#endif
 
 	ret = mmc_of_parse(dev, &plat->cfg);
 	if (ret < 0) {

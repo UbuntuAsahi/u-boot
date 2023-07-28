@@ -4,26 +4,26 @@
  */
 
 &{/soc} {
-	bootph-pre-ram;
-	bootph-all;
+	u-boot,dm-spl;
+	u-boot,dm-pre-reloc;
 };
 
 &crypto {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &sec_jr0 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &sec_jr1 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &sec_jr2 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &sec_jr3 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };

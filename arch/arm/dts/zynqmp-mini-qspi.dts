@@ -33,7 +33,7 @@
 	dcc: dcc {
 		compatible = "arm,dcc";
 		status = "disabled";
-		bootph-all;
+		u-boot,dm-pre-reloc;
 	};
 
 	amba: amba {

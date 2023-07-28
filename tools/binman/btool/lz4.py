@@ -60,7 +60,7 @@ import re
 import tempfile
 
 from binman import bintool
-from u_boot_pylib import tools
+from patman import tools
 
 # pylint: disable=C0103
 class Bintoollz4(bintool.Bintool):

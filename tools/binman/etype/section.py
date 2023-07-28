@@ -16,9 +16,9 @@ import sys
 from binman.entry import Entry
 from binman import state
 from dtoc import fdt_util
-from u_boot_pylib import tools
-from u_boot_pylib import tout
-from u_boot_pylib.tools import to_hex_size
+from patman import tools
+from patman import tout
+from patman.tools import to_hex_size
 
 
 class Entry_section(Entry):
@@ -172,7 +172,7 @@ class Entry_section(Entry):
     def IsSpecialSubnode(self, node):
         """Check if a node is a special one used by the section itself
 
-        Some nodes are used for hashing / signatures and do not add entries to
+        Some notes are used for hashing / signatures and do not add entries to
         the actual section.
 
         Returns:
@@ -397,13 +397,10 @@ class Entry_section(Entry):
             This excludes any padding. If the section is compressed, the
             compressed data is returned
         """
-        if not self.build_done:
-            data = self.BuildSectionData(required)
-            if data is None:
-                return None
-            self.SetContents(data)
-        else:
-            data = self.data
+        data = self.BuildSectionData(required)
+        if data is None:
+            return None
+        self.SetContents(data)
         if self._filename:
             tools.write_file(tools.get_output_filename(self._filename), data)
         return data
@@ -430,11 +427,8 @@ class Entry_section(Entry):
             self._SortEntries()
         self._extend_entries()
 
-        if self.build_done:
-            self.size = None
-        else:
-            data = self.BuildSectionData(True)
-            self.SetContents(data)
+        data = self.BuildSectionData(True)
+        self.SetContents(data)
 
         self.CheckSize()
 
@@ -816,9 +810,6 @@ class Entry_section(Entry):
     def LoadData(self, decomp=True):
         for entry in self._entries.values():
             entry.LoadData(decomp)
-        data = self.ReadData(decomp)
-        self.contents_size = len(data)
-        self.ProcessContentsUpdate(data)
         self.Detail('Loaded data')
 
     def GetImage(self):
@@ -875,15 +866,10 @@ class Entry_section(Entry):
         return data
 
     def WriteData(self, data, decomp=True):
-        ok = super().WriteData(data, decomp)
-
-        # The section contents are now fixed and cannot be rebuilt from the
-        # containing entries.
-        self.mark_build_done()
-        return ok
+        self.Raise("Replacing sections is not implemented yet")
 
     def WriteChildData(self, child):
-        return super().WriteChildData(child)
+        return True
 
     def SetAllowMissing(self, allow_missing):
         """Set whether a section allows missing external blobs
@@ -899,7 +885,7 @@ class Entry_section(Entry):
         """Set whether a section allows to create a fake blob
 
         Args:
-            allow_fake: True if allowed, False if not allowed
+            allow_fake_blob: True if allowed, False if not allowed
         """
         super().SetAllowFakeBlob(allow_fake)
         for entry in self._entries.values():
@@ -923,7 +909,7 @@ class Entry_section(Entry):
         If there are faked blobs, the entries are added to the list
 
         Args:
-            faked_blobs_list: List of Entry objects to be added to
+            fake_blobs_list: List of Entry objects to be added to
         """
         for entry in self._entries.values():
             entry.CheckFakedBlobs(faked_blobs_list)

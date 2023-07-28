@@ -6,30 +6,30 @@
  */
 
 &{/soc} {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &aips2 {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &iomuxc {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &iomuxc_snvs {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &uart4 {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &pinctrl_uart4 {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &gpmi {
-	bootph-pre-ram;
-	bootph-all;
+	u-boot,dm-spl;
+	u-boot,dm-pre-reloc;
 };

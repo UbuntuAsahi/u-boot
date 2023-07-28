@@ -22,8 +22,8 @@ import sys
 
 from binman import bintool
 from binman import elf
-from u_boot_pylib import command
-from u_boot_pylib import tools
+from patman import command
+from patman import tools
 
 # Set to True to enable printing output while working
 DEBUG = False

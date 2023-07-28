@@ -12,54 +12,54 @@
 	wdt-reboot {
 		compatible = "wdt-reboot";
 		wdt = <&wdog1>;
-		bootph-pre-ram;
+		u-boot,dm-spl;
 	};
 };
 
 &reg_usdhc2_vmmc {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &gpio1 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &gpio2 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &gpio3 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &i2c1 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &i2c2 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &i2c3 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &i2c4 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &i2c5 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &i2c6 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &pinctrl_i2c6 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &pmic {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };

@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: GPL-2.0+
 
 &soc {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &aips1 {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &pinctrl_uart1 {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &uart1 {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };

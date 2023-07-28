@@ -15,7 +15,7 @@
 
 #include "menu.h"
 
-#define ansi 1
+#define ansi 0
 
 /*
  * Internally, each item in a menu is represented by a struct menu_item.

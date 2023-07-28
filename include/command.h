@@ -13,8 +13,6 @@
 #include <env.h>
 #include <linker_lists.h>
 
-#include <linux/compiler_attributes.h>
-
 #ifndef NULL
 #define NULL	0
 #endif
@@ -262,17 +260,12 @@ int run_command_repeatable(const char *cmd, int flag);
 /**
  * run_commandf() - Run a command created by a format string
  *
+ * The command cannot be larger than 127 characters
+ *
  * @fmt: printf() format string
  * @...: Arguments to use (flag is always 0)
- *
- * The command cannot be larger than (CONFIG_SYS_CBSIZE - 1) characters.
- *
- * Return:
- * Returns 0 on success, -EIO if internal output error occurred, -ENOSPC in
- *	case of 'fmt' string truncation, or != 0 on error, specific for
- *	run_command().
  */
-int run_commandf(const char *fmt, ...) __printf(1, 2);
+int run_commandf(const char *fmt, ...);
 
 /**
  * Run a list of commands separated by ; or even \0
@@ -383,7 +376,7 @@ int cmd_source_script(ulong addr, const char *fit_uname, const char *confname);
 	U_BOOT_SUBCMDS_DO_CMD(_cmdname)					\
 	U_BOOT_SUBCMDS_COMPLETE(_cmdname)
 
-#if CONFIG_IS_ENABLED(CMDLINE)
+#ifdef CONFIG_CMDLINE
 #define U_BOOT_CMDREP_MKENT_COMPLETE(_name, _maxargs, _cmd_rep,		\
 				     _usage, _help, _comp)		\
 		{ #_name, _maxargs, _cmd_rep, cmd_discard_repeatable,	\

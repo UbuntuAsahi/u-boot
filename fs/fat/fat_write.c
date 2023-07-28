@@ -141,8 +141,6 @@ static int set_name(fat_itr *itr, const char *filename, char *shortname)
 	if (!strcmp(buf, filename)) {
 		ret = 1;
 		goto out;
-	} else if (!strcasecmp(buf, filename)) {
-		goto out_ret;
 	}
 
 	/* Construct an indexed short name */
@@ -179,13 +177,12 @@ static int set_name(fat_itr *itr, const char *filename, char *shortname)
 		if (find_directory_entry(itr, buf))
 			continue;
 
-		goto out_ret;
+		debug("chosen short name: %s\n", buf);
+		/* Each long name directory entry takes 13 characters. */
+		ret = (strlen(filename) + 25) / 13;
+		goto out;
 	}
 	return -EIO;
-out_ret:
-	debug("chosen short name: %s\n", buf);
-	/* Each long name directory entry takes 13 characters. */
-	ret = (strlen(filename) + 25) / 13;
 out:
 	memcpy(shortname, &dirent, SHORT_NAME_SIZE);
 	return ret;

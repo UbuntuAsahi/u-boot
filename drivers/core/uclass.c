@@ -411,14 +411,18 @@ done:
 }
 
 #if CONFIG_IS_ENABLED(OF_REAL)
-static int uclass_find_device_by_phandle_id(enum uclass_id id,
-					    uint find_phandle,
-					    struct udevice **devp)
+int uclass_find_device_by_phandle(enum uclass_id id, struct udevice *parent,
+				  const char *name, struct udevice **devp)
 {
 	struct udevice *dev;
 	struct uclass *uc;
+	int find_phandle;
 	int ret;
 
+	*devp = NULL;
+	find_phandle = dev_read_u32_default(parent, name, -1);
+	if (find_phandle <= 0)
+		return -ENOENT;
 	ret = uclass_get(id, &uc);
 	if (ret)
 		return ret;
@@ -435,19 +439,6 @@ static int uclass_find_device_by_phandle_id(enum uclass_id id,
 	}
 
 	return -ENODEV;
-}
-
-int uclass_find_device_by_phandle(enum uclass_id id, struct udevice *parent,
-				  const char *name, struct udevice **devp)
-{
-	int find_phandle;
-
-	*devp = NULL;
-	find_phandle = dev_read_u32_default(parent, name, -1);
-	if (find_phandle <= 0)
-		return -ENOENT;
-
-	return uclass_find_device_by_phandle_id(id, find_phandle, devp);
 }
 #endif
 
@@ -544,22 +535,31 @@ int uclass_get_device_by_ofnode(enum uclass_id id, ofnode node,
 	return uclass_get_device_tail(dev, ret, devp);
 }
 
-#if CONFIG_IS_ENABLED(OF_REAL)
-int uclass_get_device_by_of_path(enum uclass_id id, const char *path,
-				 struct udevice **devp)
-{
-	return uclass_get_device_by_ofnode(id, ofnode_path(path), devp);
-}
-
+#if CONFIG_IS_ENABLED(OF_CONTROL)
 int uclass_get_device_by_phandle_id(enum uclass_id id, uint phandle_id,
 				    struct udevice **devp)
 {
 	struct udevice *dev;
+	struct uclass *uc;
 	int ret;
 
 	*devp = NULL;
-	ret = uclass_find_device_by_phandle_id(id, phandle_id, &dev);
-	return uclass_get_device_tail(dev, ret, devp);
+	ret = uclass_get(id, &uc);
+	if (ret)
+		return ret;
+
+	uclass_foreach_dev(dev, uc) {
+		uint phandle;
+
+		phandle = dev_read_phandle(dev);
+
+		if (phandle == phandle_id) {
+			*devp = dev;
+			return uclass_get_device_tail(dev, ret, devp);
+		}
+	}
+
+	return -ENODEV;
 }
 
 int uclass_get_device_by_phandle(enum uclass_id id, struct udevice *parent,

@@ -9,7 +9,7 @@
 	wdt-reboot {
 		compatible = "wdt-reboot";
 		wdt = <&wdog1>;
-		bootph-pre-ram;
+		u-boot,dm-spl;
 	};
 
 	firmware {
@@ -21,7 +21,7 @@
 };
 
 &aips4 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &reg_usdhc2_vmmc {
@@ -29,67 +29,67 @@
 };
 
 &pinctrl_reg_usdhc2_vmmc {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &pinctrl_uart2 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &pinctrl_usdhc2_gpio {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &pinctrl_usdhc2 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &pinctrl_usdhc3 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &gpio1 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &gpio2 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &gpio3 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &gpio4 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &gpio5 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &uart2 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &usbmisc1 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &usbphynop1 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &usbotg1 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &usdhc1 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &usdhc2 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 	sd-uhs-sdr104;
 	sd-uhs-ddr50;
 	assigned-clocks = <&clk IMX8MM_CLK_USDHC2>;
@@ -98,7 +98,7 @@
 };
 
 &usdhc3 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 	mmc-hs400-1_8v;
 	mmc-hs400-enhanced-strobe;
 	/*
@@ -113,25 +113,25 @@
 };
 
 &i2c1 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &{/soc@0/bus@30800000/i2c@30a20000/pmic@25} {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &{/soc@0/bus@30800000/i2c@30a20000/pmic@25/regulators} {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &pinctrl_i2c1 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &pinctrl_pmic {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &wdog1 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };

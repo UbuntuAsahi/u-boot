@@ -98,7 +98,7 @@ static int do_date(struct cmd_tbl *cmdtp, int flag, int argc,
 				puts("## Get date failed\n");
 			}
 		}
-		fallthrough;
+		/* FALL TROUGH */
 	case 1:			/* get date & time */
 #ifdef CONFIG_DM_RTC
 		rcode = dm_rtc_get(dev, &tm);

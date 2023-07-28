@@ -580,8 +580,7 @@ int gpio_request_by_name(struct udevice *dev, const char *list_name,
  * This allows boards to implement common behaviours using GPIOs while not
  * requiring specific GPIO offsets be used.
  *
- * @dev:        An instance of a GPIO controller udevice, or NULL to search
- *              all GPIO controller devices
+ * @dev:	An instance of a GPIO controller udevice
  * @line_name:	The name of the GPIO (e.g. "bmc-secure-boot")
  * @desc:	A GPIO descriptor that is populated with the requested GPIO
  *              upon return

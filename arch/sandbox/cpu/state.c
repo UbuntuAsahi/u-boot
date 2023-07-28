@@ -10,7 +10,6 @@
 #include <fdtdec.h>
 #include <log.h>
 #include <os.h>
-#include <trace.h>
 #include <asm/malloc.h>
 #include <asm/state.h>
 #include <asm/test.h>
@@ -525,10 +524,6 @@ int state_uninit(void)
 	/* Delete this at the last moment so as not to upset gdb too much */
 	if (state->jumped_fname)
 		os_unlink(state->jumped_fname);
-
-	/* Disable tracing before unmapping RAM */
-	if (IS_ENABLED(CONFIG_TRACE))
-		trace_set_enabled(0);
 
 	os_free(state->state_fdt);
 	os_free(state->ram_buf);

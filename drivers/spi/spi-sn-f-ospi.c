@@ -556,7 +556,7 @@ static bool f_ospi_supports_op(struct spi_slave *slave,
 	if (!f_ospi_supports_op_width(op))
 		return false;
 
-	return spi_mem_default_supports_op(slave, op);
+	return true;
 }
 
 static int f_ospi_adjust_op_size(struct spi_slave *slave, struct spi_mem_op *op)

@@ -5,11 +5,9 @@ config FEROCEON_88FR131
 
 config KW88F6192
 	bool
-	select ARCH_VERY_EARLY_INIT
 
 config KW88F6281
 	bool
-	select ARCH_VERY_EARLY_INIT
 
 config SHEEVA_88SV131
 	bool

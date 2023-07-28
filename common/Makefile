@@ -45,7 +45,6 @@ endif # !CONFIG_SPL_BUILD
 
 obj-$(CONFIG_$(SPL_TPL_)BOOTSTAGE) += bootstage.o
 obj-$(CONFIG_$(SPL_TPL_)BLOBLIST) += bloblist.o
-obj-$(CONFIG_$(SPL_)BMP) += bmp.o
 
 ifdef CONFIG_SPL_BUILD
 ifdef CONFIG_SPL_DFU
@@ -57,8 +56,6 @@ obj-$(CONFIG_$(SPL_TPL_)OF_LIBFDT) += fdt_support.o
 obj-$(CONFIG_SPL_USB_HOST) += usb.o usb_hub.o
 obj-$(CONFIG_SPL_USB_STORAGE) += usb_storage.o
 obj-$(CONFIG_SPL_MUSB_NEW) += usb.o
-obj-$(CONFIG_SPL_SPLASH_SCREEN) += splash.o
-obj-$(CONFIG_SPL_SPLASH_SOURCE) += splash_source.o
 endif # CONFIG_SPL_BUILD
 
 #others

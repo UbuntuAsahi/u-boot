@@ -10,11 +10,11 @@
 };
 
 &pinctrl_uart1 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &uart1 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &binman {

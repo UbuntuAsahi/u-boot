@@ -148,13 +148,11 @@ static int vbe_simple_read_bootflow(struct udevice *dev, struct bootflow *bflow)
 {
 	int ret;
 
-	if (CONFIG_IS_ENABLED(BOOTMETH_VBE_SIMPLE_FW)) {
-		if (vbe_phase() == VBE_PHASE_FIRMWARE) {
-			ret = vbe_simple_read_bootflow_fw(dev, bflow);
-			if (ret)
-				return log_msg_ret("fw", ret);
-			return 0;
-		}
+	if (vbe_phase() == VBE_PHASE_FIRMWARE) {
+		ret = vbe_simple_read_bootflow_fw(dev, bflow);
+		if (ret)
+			return log_msg_ret("fw", ret);
+		return 0;
 	}
 
 	return -EINVAL;

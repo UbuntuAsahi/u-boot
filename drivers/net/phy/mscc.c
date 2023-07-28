@@ -1558,7 +1558,7 @@ static int vsc8502_config(struct phy_device *phydev)
 	return 0;
 }
 
-U_BOOT_PHY_DRIVER(vsc8530) = {
+static struct phy_driver VSC8530_driver = {
 	.name = "Microsemi VSC8530",
 	.uid = PHY_ID_VSC8530,
 	.mask = 0x000ffff0,
@@ -1568,7 +1568,7 @@ U_BOOT_PHY_DRIVER(vsc8530) = {
 	.shutdown = &genphy_shutdown,
 };
 
-U_BOOT_PHY_DRIVER(vsc8531) = {
+static struct phy_driver VSC8531_driver = {
 	.name = "Microsemi VSC8531",
 	.uid = PHY_ID_VSC8531,
 	.mask = 0x000ffff0,
@@ -1578,7 +1578,7 @@ U_BOOT_PHY_DRIVER(vsc8531) = {
 	.shutdown = &genphy_shutdown,
 };
 
-U_BOOT_PHY_DRIVER(vsc8502) = {
+static struct phy_driver VSC8502_driver = {
 	.name = "Microsemi VSC8502",
 	.uid = PHY_ID_VSC8502,
 	.mask = 0x000ffff0,
@@ -1588,7 +1588,7 @@ U_BOOT_PHY_DRIVER(vsc8502) = {
 	.shutdown = &genphy_shutdown,
 };
 
-U_BOOT_PHY_DRIVER(vsc8540) = {
+static struct phy_driver VSC8540_driver = {
 	.name = "Microsemi VSC8540",
 	.uid = PHY_ID_VSC8540,
 	.mask = 0x000ffff0,
@@ -1598,7 +1598,7 @@ U_BOOT_PHY_DRIVER(vsc8540) = {
 	.shutdown = &genphy_shutdown,
 };
 
-U_BOOT_PHY_DRIVER(vsc8541) = {
+static struct phy_driver VSC8541_driver = {
 	.name = "Microsemi VSC8541",
 	.uid = PHY_ID_VSC8541,
 	.mask = 0x000ffff0,
@@ -1608,7 +1608,7 @@ U_BOOT_PHY_DRIVER(vsc8541) = {
 	.shutdown = &genphy_shutdown,
 };
 
-U_BOOT_PHY_DRIVER(vsc8574) = {
+static struct phy_driver VSC8574_driver = {
 	.name = "Microsemi VSC8574",
 	.uid = PHY_ID_VSC8574,
 	.mask = 0x000ffff0,
@@ -1618,7 +1618,7 @@ U_BOOT_PHY_DRIVER(vsc8574) = {
 	.shutdown = &genphy_shutdown,
 };
 
-U_BOOT_PHY_DRIVER(vsc8584) = {
+static struct phy_driver VSC8584_driver = {
 	.name = "Microsemi VSC8584",
 	.uid = PHY_ID_VSC8584,
 	.mask = 0x000ffff0,
@@ -1627,3 +1627,16 @@ U_BOOT_PHY_DRIVER(vsc8584) = {
 	.startup = &mscc_startup,
 	.shutdown = &genphy_shutdown,
 };
+
+int phy_mscc_init(void)
+{
+	phy_register(&VSC8530_driver);
+	phy_register(&VSC8531_driver);
+	phy_register(&VSC8502_driver);
+	phy_register(&VSC8540_driver);
+	phy_register(&VSC8541_driver);
+	phy_register(&VSC8574_driver);
+	phy_register(&VSC8584_driver);
+
+	return 0;
+}

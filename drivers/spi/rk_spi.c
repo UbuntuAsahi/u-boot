@@ -45,7 +45,7 @@ struct rockchip_spi_plat {
 	struct dtd_rockchip_rk3288_spi of_plat;
 #endif
 	s32 frequency;		/* Default clock frequency, -1 for none */
-	uintptr_t base;
+	fdt_addr_t base;
 	uint deactivate_delay_us;	/* Delay to wait after deactivate */
 	uint activate_delay_us;		/* Delay to wait after activate */
 };

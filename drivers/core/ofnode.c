@@ -998,7 +998,7 @@ int ofnode_decode_panel_timing(ofnode parent,
 	u32 val = 0;
 	int ret = 0;
 
-	timings = ofnode_find_subnode(parent, "panel-timing");
+	timings = ofnode_find_subnode(parent, "panel-timings");
 	if (!ofnode_valid(timings))
 		return -EINVAL;
 	memset(dt, 0, sizeof(*dt));
@@ -1312,35 +1312,23 @@ bool ofnode_pre_reloc(ofnode node)
 {
 #if defined(CONFIG_SPL_BUILD) || defined(CONFIG_TPL_BUILD)
 	/* for SPL and TPL the remaining nodes after the fdtgrep 1st pass
-	 * had property bootph-all or bootph-pre-sram/bootph-pre-ram.
+	 * had property dm-pre-reloc or u-boot,dm-spl/tpl.
 	 * They are removed in final dtb (fdtgrep 2nd pass)
 	 */
 	return true;
 #else
-	if (ofnode_read_bool(node, "bootph-all"))
+	if (ofnode_read_bool(node, "u-boot,dm-pre-reloc"))
 		return true;
-	if (ofnode_read_bool(node, "bootph-some-ram"))
+	if (ofnode_read_bool(node, "u-boot,dm-pre-proper"))
 		return true;
 
 	/*
 	 * In regular builds individual spl and tpl handling both
 	 * count as handled pre-relocation for later second init.
 	 */
-	if (ofnode_read_bool(node, "bootph-pre-ram") ||
-	    ofnode_read_bool(node, "bootph-pre-sram"))
+	if (ofnode_read_bool(node, "u-boot,dm-spl") ||
+	    ofnode_read_bool(node, "u-boot,dm-tpl"))
 		return true;
-
-	if (IS_ENABLED(CONFIG_OF_TAG_MIGRATE)) {
-		/* detect and handle old tags */
-		if (ofnode_read_bool(node, "u-boot,dm-pre-reloc") ||
-		    ofnode_read_bool(node, "u-boot,dm-pre-proper") ||
-		    ofnode_read_bool(node, "u-boot,dm-spl") ||
-		    ofnode_read_bool(node, "u-boot,dm-tpl") ||
-		    ofnode_read_bool(node, "u-boot,dm-vpl")) {
-			gd->flags |= GD_FLG_OF_TAG_MIGRATE;
-			return true;
-		}
-	}
 
 	return false;
 #endif

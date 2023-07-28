@@ -7,7 +7,7 @@
 
 /{
 	ocp {
-		bootph-pre-ram;
+		u-boot,dm-spl;
 	};
 
 	xtal25mhz: xtal25mhz {
@@ -18,11 +18,11 @@
 };
 
 &uart0 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &i2c0 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 
 	cdce913: cdce913@65 {
 		compatible = "ti,cdce913";
@@ -34,5 +34,5 @@
 };
 
 &mmc1 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };

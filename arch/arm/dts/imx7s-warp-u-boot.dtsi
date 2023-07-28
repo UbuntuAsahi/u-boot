@@ -10,17 +10,17 @@
 };
 
 &aips3 {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &pinctrl_uart1 {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &soc {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &uart1 {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };

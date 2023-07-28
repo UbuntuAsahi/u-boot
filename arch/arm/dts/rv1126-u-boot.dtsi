@@ -13,50 +13,50 @@
 
 	dmc {
 		compatible = "rockchip,rv1126-dmc";
-		bootph-all;
+		u-boot,dm-pre-reloc;
 	};
 };
 
 &gpio0 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &gpio1 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &grf {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &pmu {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &pmugrf {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &xin24m {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &cru {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &pmucru {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &sdmmc {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &emmc {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &uart2 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };

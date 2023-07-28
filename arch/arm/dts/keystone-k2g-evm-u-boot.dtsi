@@ -5,7 +5,7 @@
 
 /{
 	soc {
-		bootph-all;
+		u-boot,dm-pre-reloc;
 	};
 	aliases {
 		usb0 = &usb0;
@@ -14,11 +14,11 @@
 };
 
 &i2c0 {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &i2c1 {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &usb0_phy {

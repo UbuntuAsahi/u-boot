@@ -66,7 +66,7 @@ int imagetool_verify_print_header(
 				 */
 				if ((*curr)->print_header) {
 					if (!params->quiet)
-						(*curr)->print_header(ptr, params);
+						(*curr)->print_header(ptr);
 				} else {
 					fprintf(stderr,
 						"%s: print_header undefined for %s\n",
@@ -103,7 +103,7 @@ static int imagetool_verify_print_header_by_type(
 			 */
 			if (tparams->print_header) {
 				if (!params->quiet)
-					tparams->print_header(ptr, params);
+					tparams->print_header(ptr);
 			} else {
 				fprintf(stderr,
 					"%s: print_header undefined for %s\n",

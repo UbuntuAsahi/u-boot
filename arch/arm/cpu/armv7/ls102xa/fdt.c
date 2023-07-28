@@ -25,7 +25,11 @@ DECLARE_GLOBAL_DATA_PTR;
 
 void ft_fixup_enet_phy_connect_type(void *fdt)
 {
+#ifdef CONFIG_DM_ETH
 	struct udevice *dev;
+#else
+	struct eth_device *dev;
+#endif
 	struct tsec_private *priv;
 	const char *enet_path, *phy_path;
 	char enet[16];
@@ -33,8 +37,12 @@ void ft_fixup_enet_phy_connect_type(void *fdt)
 	int phy_node;
 	int i = 0;
 	uint32_t ph;
+#ifdef CONFIG_DM_ETH
 	char *name[3] = { "ethernet@2d10000", "ethernet@2d50000",
 			  "ethernet@2d90000" };
+#else
+	char *name[3] = { "eTSEC1", "eTSEC2", "eTSEC3" };
+#endif
 
 	for (; i < ARRAY_SIZE(name); i++) {
 		dev = eth_get_dev_by_name(name[i]);
@@ -45,7 +53,11 @@ void ft_fixup_enet_phy_connect_type(void *fdt)
 			continue;
 		}
 
+#ifdef CONFIG_DM_ETH
 		priv = dev_get_priv(dev);
+#else
+		priv = dev->priv;
+#endif
 		if (priv->flags & TSEC_SGMII)
 			continue;
 

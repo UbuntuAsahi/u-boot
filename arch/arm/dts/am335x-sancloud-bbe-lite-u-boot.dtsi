@@ -9,36 +9,36 @@
 &l4_wkup {
 	segment@200000 {
 		target-module@0 {
-			bootph-all;
+			u-boot,dm-pre-reloc;
 		};
 	};
 };
 
 &prcm {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &per_cm {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &l4ls_clkctrl {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &l4_per {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 	segment@0 {
-		bootph-all;
+		u-boot,dm-pre-reloc;
 		target-module@30000 {
-			bootph-all;
+			u-boot,dm-pre-reloc;
 		};
 	};
 };
 
 &spi0 {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 	channel@0 {
-		bootph-all;
+		u-boot,dm-pre-reloc;
 	};
 };

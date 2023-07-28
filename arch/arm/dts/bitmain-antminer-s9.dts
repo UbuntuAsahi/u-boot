@@ -70,13 +70,13 @@
 };
 
 &sdhci0 {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 	status = "okay";
 	disable-wp;
 };
 
 &uart1 {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 	status = "okay";
 };
 

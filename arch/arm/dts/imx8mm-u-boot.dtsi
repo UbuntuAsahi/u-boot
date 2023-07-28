@@ -10,21 +10,21 @@
 };
 
 &soc {
-	bootph-all;
-	bootph-pre-ram;
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
 };
 
 &aips1 {
-	bootph-all;
-	bootph-pre-ram;
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
 };
 
 &aips2 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &aips3 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &binman {
@@ -81,9 +81,7 @@
 
 		fit {
 			description = "Configuration to load ATF before U-Boot";
-#ifndef CONFIG_IMX_HAB
 			fit,external-offset = <CONFIG_FIT_EXTERNAL_OFFSET>;
-#endif
 			fit,fdt-list = "of-list";
 			#address-cells = <1>;
 
@@ -191,28 +189,28 @@
 };
 
 &clk {
-	bootph-all;
-	bootph-pre-ram;
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
 	/delete-property/ assigned-clocks;
 	/delete-property/ assigned-clock-parents;
 	/delete-property/ assigned-clock-rates;
 };
 
 &iomuxc {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &osc_24m {
-	bootph-all;
-	bootph-pre-ram;
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
 };
 
 &spba1 {
-	bootph-all;
-	bootph-pre-ram;
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
 };
 
 &spba2 {
-	bootph-all;
-	bootph-pre-ram;
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
 };

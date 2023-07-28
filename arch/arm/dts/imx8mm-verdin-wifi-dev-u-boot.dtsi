@@ -15,7 +15,7 @@
 
 	wdt-reboot {
 		compatible = "wdt-reboot";
-		bootph-pre-ram;
+		u-boot,dm-spl;
 		wdt = <&wdog1>;
 	};
 };
@@ -27,11 +27,11 @@
 };
 
 &{/soc@0/bus@30800000/i2c@30a20000/pmic@25} {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &{/soc@0/bus@30800000/i2c@30a20000/pmic@25/regulators} {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &binman_uboot {
@@ -39,27 +39,27 @@
 };
 
 &gpio1 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &gpio2 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &gpio3 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &gpio4 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &gpio5 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &i2c1 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 
 	eeprom_module: eeprom@50 {
 		compatible = "i2c-eeprom";
@@ -89,45 +89,45 @@
 };
 
 &pinctrl_i2c1 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &pinctrl_pmic {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &pinctrl_uart1 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &pinctrl_usdhc1 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &pinctrl_usdhc2 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &pinctrl_wdog {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &uart1 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &usdhc1 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &usdhc2 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &usdhc3 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &wdog1 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };

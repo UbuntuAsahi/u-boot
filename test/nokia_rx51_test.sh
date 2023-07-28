@@ -83,10 +83,8 @@ echo
 
 # Download qflasher and nolo images
 # This is proprietary qemu flasher tool with first stage images, but license allows non-commercial redistribution
-if ! test -f qflasher || ! test -f xloader-qemu.bin || ! test -f secondary-qemu.bin; then
-	test -f qemu-n900.tar.gz || wget -c http://repository.maemo.org/qemu-n900/qemu-n900.tar.gz
-	tar -xf qemu-n900.tar.gz
-fi
+wget -c http://repository.maemo.org/qemu-n900/qemu-n900.tar.gz
+tar -xf qemu-n900.tar.gz
 
 # Download Maemo script u-boot-gen-combined
 if ! test -f u-boot-gen-combined; then
@@ -96,22 +94,16 @@ if ! test -f u-boot-gen-combined; then
 fi
 
 # Download Maemo fiasco kernel
-if ! test -d kernel_2.6.28; then
-	test -f kernel_2.6.28-20103103+0m5_armel.deb || wget -c http://repository.maemo.org/pool/maemo5.0/free/k/kernel/kernel_2.6.28-20103103+0m5_armel.deb
-	dpkg -x kernel_2.6.28-20103103+0m5_armel.deb kernel_2.6.28
-fi
+wget -c http://repository.maemo.org/pool/maemo5.0/free/k/kernel/kernel_2.6.28-20103103+0m5_armel.deb
+dpkg -x kernel_2.6.28-20103103+0m5_armel.deb kernel_2.6.28
 
 # Download Maemo libc
-if ! test -d libc6_2.5.1; then
-	test -f libc6_2.5.1-1eglibc27+0m5_armel.deb || wget -c http://repository.maemo.org/pool/maemo5.0/free/g/glibc/libc6_2.5.1-1eglibc27+0m5_armel.deb
-	dpkg -x libc6_2.5.1-1eglibc27+0m5_armel.deb libc6_2.5.1
-fi
+wget -c http://repository.maemo.org/pool/maemo5.0/free/g/glibc/libc6_2.5.1-1eglibc27+0m5_armel.deb
+dpkg -x libc6_2.5.1-1eglibc27+0m5_armel.deb libc6_2.5.1
 
 # Download Maemo busybox
-if ! test -d busybox_1.10.2; then
-	test -f busybox_1.10.2.legal-1osso30+0m5_armel.deb || wget -c http://repository.maemo.org/pool/maemo5.0/free/b/busybox/busybox_1.10.2.legal-1osso30+0m5_armel.deb
-	dpkg -x busybox_1.10.2.legal-1osso30+0m5_armel.deb busybox_1.10.2
-fi
+wget -c http://repository.maemo.org/pool/maemo5.0/free/b/busybox/busybox_1.10.2.legal-1osso30+0m5_armel.deb
+dpkg -x busybox_1.10.2.legal-1osso30+0m5_armel.deb busybox_1.10.2
 
 echo
 echo "======================================="

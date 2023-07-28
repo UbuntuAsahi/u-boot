@@ -690,50 +690,89 @@ int efi_disk_probe(void *ctx, struct event *event)
 	return 0;
 }
 
-/**
- * efi_disk_remove - delete an efi_disk object for a block device or partition
+/*
+ * Delete an efi_disk object for a whole raw disk
  *
- * @ctx:	event context: driver binding protocol
- * @event:	EV_PM_PRE_REMOVE event
+ * @dev		uclass device (UCLASS_BLK)
  *
- * Delete an efi_disk object which is associated with the UCLASS_BLK or
- * UCLASS_PARTITION device for which the EV_PM_PRE_REMOVE event is raised.
+ * Delete an efi_disk object which is associated with @dev.
+ * The type of @dev must be UCLASS_BLK.
  *
- * Return:	0 on success, -1 otherwise
+ * @return	0 on success, -1 otherwise
  */
-int efi_disk_remove(void *ctx, struct event *event)
+static int efi_disk_delete_raw(struct udevice *dev)
 {
-	enum uclass_id id;
-	struct udevice *dev = event->data.dm.dev;
 	efi_handle_t handle;
 	struct blk_desc *desc;
-	struct efi_disk_obj *diskobj = NULL;
+	struct efi_disk_obj *diskobj;
 
 	if (dev_tag_get_ptr(dev, DM_TAG_EFI, (void **)&handle))
-		return 0;
+		return -1;
 
-	id = device_get_uclass_id(dev);
-	switch (id) {
-	case UCLASS_BLK:
-		desc = dev_get_uclass_plat(dev);
-		if (desc && desc->uclass_id != UCLASS_EFI_LOADER)
-			diskobj = container_of(handle, struct efi_disk_obj,
-					       header);
-		break;
-	case UCLASS_PARTITION:
+	desc = dev_get_uclass_plat(dev);
+	if (desc->uclass_id != UCLASS_EFI_LOADER) {
 		diskobj = container_of(handle, struct efi_disk_obj, header);
-		break;
-	default:
-		return 0;
-	}
-
-	if (diskobj)
 		efi_free_pool(diskobj->dp);
+	}
 
 	efi_delete_handle(handle);
 	dev_tag_del(dev, DM_TAG_EFI);
 
 	return 0;
+}
+
+/*
+ * Delete an efi_disk object for a disk partition
+ *
+ * @dev		uclass device (UCLASS_PARTITION)
+ *
+ * Delete an efi_disk object which is associated with @dev.
+ * The type of @dev must be UCLASS_PARTITION.
+ *
+ * @return	0 on success, -1 otherwise
+ */
+static int efi_disk_delete_part(struct udevice *dev)
+{
+	efi_handle_t handle;
+	struct efi_disk_obj *diskobj;
+
+	if (dev_tag_get_ptr(dev, DM_TAG_EFI, (void **)&handle))
+		return -1;
+
+	diskobj = container_of(handle, struct efi_disk_obj, header);
+
+	efi_free_pool(diskobj->dp);
+	efi_delete_handle(handle);
+	dev_tag_del(dev, DM_TAG_EFI);
+
+	return 0;
+}
+
+/*
+ * Delete an efi_disk object for a block device
+ *
+ * @dev		uclass device (UCLASS_BLK or UCLASS_PARTITION)
+ *
+ * Delete an efi_disk object which is associated with @dev.
+ * The type of @dev must be either UCLASS_BLK or UCLASS_PARTITION.
+ * This function is expected to be called at EV_PM_PRE_REMOVE.
+ *
+ * @return	0 on success, -1 otherwise
+ */
+int efi_disk_remove(void *ctx, struct event *event)
+{
+	enum uclass_id id;
+	struct udevice *dev;
+
+	dev = event->data.dm.dev;
+	id = device_get_uclass_id(dev);
+
+	if (id == UCLASS_BLK)
+		return efi_disk_delete_raw(dev);
+	else if (id == UCLASS_PARTITION)
+		return efi_disk_delete_part(dev);
+	else
+		return 0;
 }
 
 /**

@@ -33,7 +33,7 @@
 	};
 
 	clk1: clk1 {
-		bootph-all;
+		u-boot,dm-pre-reloc;
 		compatible = "fixed-clock";
 		#clock-cells = <0>;
 		clock-frequency = <1000000>;
@@ -42,18 +42,18 @@
 	dcc: dcc {
 		compatible = "arm,dcc";
 		status = "okay";
-		bootph-all;
+		u-boot,dm-pre-reloc;
 	};
 
 	amba: axi {
 		compatible = "simple-bus";
-		bootph-all;
+		u-boot,dm-pre-reloc;
 		#address-cells = <2>;
 		#size-cells = <2>;
 		ranges;
 
 		serial0: serial@f1920000 {
-			bootph-all;
+			u-boot,dm-pre-reloc;
 			compatible = "arm,pl011", "arm,primecell";
 			reg = <0 0xf1920000 0 0x1000>;
 			reg-io-width = <4>;

@@ -24,27 +24,27 @@
 };
 
 &emmc_clk {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &emmc_cmd {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &emmc_bus8 {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &gpio0 {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &gpio1 {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &gpio2 {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 
 	/*
 	 * The Qseven BIOS_DISABLE signal on the PX30-µQ7 keeps the on-module
@@ -53,39 +53,39 @@
 	 * the SPL has been booted from SD Card.
 	 */
 	bios-disable-override-hog {
-		bootph-all;
+		u-boot,dm-pre-reloc;
 	};
 };
 
 &pinctrl {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &pcfg_pull_none_8ma {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &pcfg_pull_up_8ma {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &sdmmc_bus4 {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &sdmmc_clk {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &sdmmc_cmd {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &sdmmc_det {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &uart0 {
 	clock-frequency = <24000000>;
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };

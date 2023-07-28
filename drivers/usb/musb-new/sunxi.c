@@ -81,6 +81,8 @@
  * From usbc/usbc.c
  ******************************************************************************/
 
+#define OFF_SUN6I_AHB_RESET0	0x2c0
+
 struct sunxi_musb_config {
 	struct musb_hdrc_config *config;
 };
@@ -484,7 +486,7 @@ static int musb_usb_probe(struct udevice *dev)
 #else
 	pdata.mode = MUSB_PERIPHERAL;
 	host->host = musb_register(&pdata, &glue->dev, base);
-	if (IS_ERR_OR_NULL(host->host))
+	if (!host->host)
 		return -EIO;
 
 	printf("Allwinner mUSB OTG (Peripheral)\n");

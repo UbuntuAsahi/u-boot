@@ -17,10 +17,10 @@ from buildman import cfgutil
 from buildman import control
 from buildman import toolchain
 from patman import commit
-from u_boot_pylib import command
-from u_boot_pylib import terminal
-from u_boot_pylib import test_util
-from u_boot_pylib import tools
+from patman import command
+from patman import terminal
+from patman import test_util
+from patman import tools
 
 use_network = True
 

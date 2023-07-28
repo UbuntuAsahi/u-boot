@@ -10,9 +10,7 @@ obj-y += bios.o
 obj-y += bios_asm.o
 obj-y += bios_interrupts.o
 endif
-endif
-ifndef CONFIG_SPL_BUILD
-obj-$(CONFIG_X86_32BIT_INIT) += string.o
+obj-y += string.o
 endif
 ifndef CONFIG_SPL_BUILD
 obj-$(CONFIG_CMD_BOOTM) += bootm.o
