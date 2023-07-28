@@ -24,4 +24,4 @@ Description: A boot loader for Apple silicon systems
  supported architectures, including PPC, ARM, MIPS, x86, m68k,
  NIOS, and Microblaze.
  .
- This package includes boot loaders for various Apple platforms.
+ This package includes boot loaders for Apple Silicon platforms.
