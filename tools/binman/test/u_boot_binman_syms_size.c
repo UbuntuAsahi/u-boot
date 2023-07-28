@@ -5,6 +5,8 @@
  * Simple program to create some binman symbols. This is used by binman tests.
  */
 
+typedef unsigned long ulong;
+
 #include <linux/kconfig.h>
 #include <binman_sym.h>
 

@@ -54,7 +54,7 @@ static int conv_of_plat(struct udevice *dev)
 	struct dtd_rockchip_rk3328_dmc *dtplat = &plat->dtplat;
 	int ret;
 
-	ret = regmap_init_mem_plat(dev, dtplat->reg, sizeof(dtplat->reg[0]),
+	ret = regmap_init_mem_plat(dev, dtplat->reg,
 				   ARRAY_SIZE(dtplat->reg) / 2, &plat->map);
 	if (ret)
 		return ret;

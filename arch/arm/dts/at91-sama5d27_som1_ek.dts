@@ -51,7 +51,7 @@
 	compatible = "atmel,sama5d27-som1-ek", "atmel,sama5d2", "atmel,sama5";
 
 	chosen {
-		bootph-all;
+		u-boot,dm-pre-reloc;
 		stdout-path = &uart1;
 	};
 
@@ -85,7 +85,7 @@
 			pinctrl-names = "default";
 			pinctrl-0 = <&pinctrl_sdmmc0_default>;
 			status = "okay";
-			bootph-all;
+			u-boot,dm-pre-reloc;
 		};
 
 		sdmmc1: sdio-host@b0000000 {
@@ -93,7 +93,7 @@
 			pinctrl-names = "default";
 			pinctrl-0 = <&pinctrl_sdmmc1_default>;
 			status = "okay"; /* conflict with qspi0 */
-			bootph-all;
+			u-boot,dm-pre-reloc;
 		};
 
 		apb {
@@ -103,10 +103,10 @@
 				pinctrl-names = "default";
 				pinctrl-0 = <&pinctrl_lcd_base &pinctrl_lcd_pwm &pinctrl_lcd_rgb666>;
 				status = "okay";
-				bootph-all;
+				u-boot,dm-pre-reloc;
 
 				display-timings {
-					bootph-all;
+					u-boot,dm-pre-reloc;
 					480x272 {
 						clock-frequency = <9000000>;
 						hactive = <480>;
@@ -117,7 +117,7 @@
 						vfront-porch = <2>;
 						vback-porch = <2>;
 						vsync-len = <11>;
-						bootph-all;
+						u-boot,dm-pre-reloc;
 					};
 				};
 			};
@@ -126,7 +126,7 @@
 				pinctrl-names = "default";
 				pinctrl-0 = <&pinctrl_uart1_default>;
 				status = "okay";
-				bootph-all;
+				u-boot,dm-pre-reloc;
 			};
 
 			pioA: pinctrl@fc038000 {
@@ -178,7 +178,7 @@
 								 <PIN_PA8__SDMMC0_DAT6>,
 								 <PIN_PA9__SDMMC0_DAT7>;
 							bias-pull-up;
-							bootph-all;
+							u-boot,dm-pre-reloc;
 						};
 
 						ck_cd {
@@ -186,7 +186,7 @@
 								 <PIN_PA10__SDMMC0_RSTN>,
 								 <PIN_PA13__SDMMC0_CD>;
 							bias-disable;
-							bootph-all;
+							u-boot,dm-pre-reloc;
 						};
 					};
 
@@ -198,14 +198,14 @@
 								 <PIN_PA20__SDMMC1_DAT2>,
 								 <PIN_PA21__SDMMC1_DAT3>;
 							bias-pull-up;
-							bootph-all;
+							u-boot,dm-pre-reloc;
 						};
 
 						ck_cd {
 							pinmux = <PIN_PA22__SDMMC1_CK>,
 								 <PIN_PA30__SDMMC1_CD>;
 							bias-disable;
-							bootph-all;
+							u-boot,dm-pre-reloc;
 						};
 					};
 
@@ -213,7 +213,7 @@
 						pinmux = <PIN_PD2__URXD1>,
 							 <PIN_PD3__UTXD1>;
 						bias-disable;
-						bootph-all;
+						u-boot,dm-pre-reloc;
 					};
 
 					pinctrl_usb_default: usb_default {

@@ -8,8 +8,6 @@
  * JinHua Luo, GuangDong Linux Center, <luo.jinhua@gd-linux.com>
  */
 
-#define pr_fmt(fmt) "cli: %s: " fmt, __func__
-
 #include <common.h>
 #include <bootstage.h>
 #include <cli.h>
@@ -22,7 +20,6 @@
 #include <malloc.h>
 #include <asm/global_data.h>
 #include <dm/ofnode.h>
-#include <linux/errno.h>
 
 #ifdef CONFIG_CMDLINE
 /*
@@ -132,26 +129,16 @@ int run_command_list(const char *cmd, int len, int flag)
 int run_commandf(const char *fmt, ...)
 {
 	va_list args;
-	int nbytes;
+	char cmd[128];
+	int i, ret;
 
 	va_start(args, fmt);
-	/*
-	 * Limit the console_buffer space being used to CONFIG_SYS_CBSIZE,
-	 * because its last byte is used to fit the replacement of \0 by \n\0
-	 * in underlying hush parser
-	 */
-	nbytes = vsnprintf(console_buffer, CONFIG_SYS_CBSIZE, fmt, args);
+	i = vsnprintf(cmd, sizeof(cmd), fmt, args);
 	va_end(args);
 
-	if (nbytes < 0) {
-		pr_debug("I/O internal error occurred.\n");
-		return -EIO;
-	} else if (nbytes >= CONFIG_SYS_CBSIZE) {
-		pr_debug("'fmt' size:%d exceeds the limit(%d)\n",
-			 nbytes, CONFIG_SYS_CBSIZE);
-		return -ENOSPC;
-	}
-	return run_command(console_buffer, 0);
+	ret = run_command(cmd, 0);
+
+	return ret;
 }
 
 /****************************************************************************/

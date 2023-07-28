@@ -26,10 +26,10 @@
 	};
 
 	soc {
-		bootph-all;
+		u-boot,dm-pre-reloc;
 
 		ddr: ddr@5a003000 {
-			bootph-all;
+			u-boot,dm-pre-reloc;
 
 			compatible = "st,stm32mp1-ddr";
 
@@ -42,73 +42,73 @@
 
 	/* need PSCI for sysreset during board_f */
 	psci {
-		bootph-some-ram;
+		u-boot,dm-pre-proper;
 	};
 };
 
 &bsec {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &gpioa {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &gpiob {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &gpioc {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &gpiod {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &gpioe {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &gpiof {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &gpiog {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &gpioh {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &gpioi {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &gpioj {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &gpiok {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &gpioz {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &optee {
-	bootph-some-ram;
+	u-boot,dm-pre-proper;
 };
 
 &iwdg2 {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 /* pre-reloc probe = reserve video frame buffer in video_reserve() */
 &ltdc {
-	bootph-some-ram;
+	u-boot,dm-pre-proper;
 };
 
 /* temp = waiting kernel update */
@@ -119,19 +119,19 @@
 };
 
 &pinctrl {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &pinctrl_z {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &rcc {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &scmi {
-	bootph-some-ram;
+	u-boot,dm-pre-proper;
 };
 
 &usart1 {

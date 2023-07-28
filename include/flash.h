@@ -46,7 +46,6 @@ typedef struct {
 #ifdef CONFIG_CFI_FLASH			/* DM-specific parts */
 	struct udevice *dev;
 	phys_addr_t base;
-	phys_size_t addr_size;
 #endif
 } flash_info_t;
 

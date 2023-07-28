@@ -22,11 +22,6 @@ struct mpc8xxx_gpio_plat {
        uint ngpios;
 };
 
-struct qe_gpio_plat {
-	ulong addr;
-	unsigned long size;
-};
-
 #ifndef DM_GPIO
 void mpc83xx_gpio_init_f(void);
 void mpc83xx_gpio_init_r(void);

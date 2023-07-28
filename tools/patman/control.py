@@ -14,7 +14,7 @@ import sys
 from patman import checkpatch
 from patman import gitutil
 from patman import patchstream
-from u_boot_pylib import terminal
+from patman import terminal
 
 def setup():
     """Do required setup before doing anything"""
@@ -85,7 +85,7 @@ def check_patches(series, patch_files, run_checkpatch, verbose, use_tree):
     # Do a few checks on the series
     series.DoChecks()
 
-    # Check the patches
+    # Check the patches, and run them through 'git am' just to be sure
     if run_checkpatch:
         ok = checkpatch.check_patches(verbose, patch_files, use_tree)
     else:

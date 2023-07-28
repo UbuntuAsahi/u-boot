@@ -11,7 +11,6 @@
 #include <common.h>
 #include <blk.h>
 #include <command.h>
-#include <mapmem.h>
 
 int blk_common_cmd(int argc, char *const argv[], enum uclass_id uclass_id,
 		   int *cur_devnump)
@@ -64,37 +63,31 @@ int blk_common_cmd(int argc, char *const argv[], enum uclass_id uclass_id,
 
 	default: /* at least 4 args */
 		if (strcmp(argv[1], "read") == 0) {
-			phys_addr_t paddr = hextoul(argv[2], NULL);
+			ulong addr = hextoul(argv[2], NULL);
 			lbaint_t blk = hextoul(argv[3], NULL);
 			ulong cnt = hextoul(argv[4], NULL);
-			void *vaddr;
 			ulong n;
 
 			printf("\n%s read: device %d block # "LBAFU", count %lu ... ",
 			       if_name, *cur_devnump, blk, cnt);
 
-			vaddr = map_sysmem(paddr, 512 * cnt);
 			n = blk_read_devnum(uclass_id, *cur_devnump, blk, cnt,
-					    vaddr);
-			unmap_sysmem(vaddr);
+					    (ulong *)addr);
 
 			printf("%ld blocks read: %s\n", n,
 			       n == cnt ? "OK" : "ERROR");
 			return n == cnt ? 0 : 1;
 		} else if (strcmp(argv[1], "write") == 0) {
-			phys_addr_t paddr = hextoul(argv[2], NULL);
+			ulong addr = hextoul(argv[2], NULL);
 			lbaint_t blk = hextoul(argv[3], NULL);
 			ulong cnt = hextoul(argv[4], NULL);
-			void *vaddr;
 			ulong n;
 
 			printf("\n%s write: device %d block # "LBAFU", count %lu ... ",
 			       if_name, *cur_devnump, blk, cnt);
 
-			vaddr = map_sysmem(paddr, 512 * cnt);
 			n = blk_write_devnum(uclass_id, *cur_devnump, blk, cnt,
-					     vaddr);
-			unmap_sysmem(vaddr);
+					     (ulong *)addr);
 
 			printf("%ld blocks written: %s\n", n,
 			       n == cnt ? "OK" : "ERROR");

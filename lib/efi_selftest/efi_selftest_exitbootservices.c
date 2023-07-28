@@ -27,7 +27,7 @@ struct notification_context {
 
 static struct efi_boot_services *boottime;
 static struct efi_event *efi_st_event_notify;
-static struct notification_record record;
+struct notification_record record;
 
 struct notification_context context_before = {
 	.record = &record,

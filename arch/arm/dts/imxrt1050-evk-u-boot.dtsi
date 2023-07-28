@@ -14,16 +14,16 @@
 	};
 
 	chosen {
-		bootph-pre-ram;
+		u-boot,dm-spl;
 		tick-timer = &gpt;
 	};
 
 	clocks {
-		bootph-pre-ram;
+		u-boot,dm-spl;
 	};
 
 	soc {
-		bootph-pre-ram;
+		u-boot,dm-spl;
 
 		usbphy1: usbphy@400d9000 {
 			compatible = "fsl,imxrt-usbphy";
@@ -75,7 +75,7 @@
 };
 
 &semc {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 	/*
 	 * Memory configuration from sdram datasheet IS42S16160J-6BLI
 	 */
@@ -109,62 +109,62 @@
 	bank1: bank@0 {
 		fsl,base-address = <0x80000000>;
 		fsl,memory-size = <MEM_SIZE_32M>;
-		bootph-pre-ram;
+		u-boot,dm-spl;
 	};
 };
 
 &osc {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &anatop {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &clks {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &gpio1 {
 	compatible = "fsl,imxrt-gpio", "fsl,imx35-gpio";
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &gpio2 {
 	compatible = "fsl,imxrt-gpio", "fsl,imx35-gpio";
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &gpio3 {
 	compatible = "fsl,imxrt-gpio", "fsl,imx35-gpio";
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &gpio4 {
 	compatible = "fsl,imxrt-gpio", "fsl,imx35-gpio";
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &gpio5 {
 	compatible = "fsl,imxrt-gpio", "fsl,imx35-gpio";
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &gpt {
 	clocks = <&osc>;
 	compatible = "fsl,imxrt-gpt";
 	status = "okay";
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &lpuart1 { /* console */
 	compatible = "fsl,imxrt-lpuart";
 	clock-names = "per";
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &iomuxc {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 	compatible = "fsl,imxrt-iomuxc";
 	pinctrl-0 = <&pinctrl_lpuart1>;
 
@@ -251,7 +251,7 @@
 			MXRT1050_IOMUXC_GPIO_EMC_39_SEMC_DQS
 				(IMX_PAD_SION | 0xf1)	/* SEMC_DQS */
 		>;
-		bootph-pre-ram;
+		u-boot,dm-spl;
 	};
 
 	pinctrl_lcdif: lcdifgrp {
@@ -281,17 +281,17 @@
 	};
 
 	pinctrl_lpuart1: lpuart1grp {
-		bootph-pre-ram;
+		u-boot,dm-spl;
 	};
 
 	pinctrl_usdhc0: usdhc0grp {
-		bootph-pre-ram;
+		u-boot,dm-spl;
 	};
  };
 
 &usdhc1 {
 	compatible = "fsl,imxrt-usdhc";
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &lcdif {

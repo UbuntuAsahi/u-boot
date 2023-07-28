@@ -13,7 +13,7 @@
 	};
 
 	soc {
-		bootph-all;
+		u-boot,dm-pre-reloc;
 	};
 
 	leds {
@@ -70,20 +70,20 @@
 };
 
 &ostm0 {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &pinctrl {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &scif2 {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 	clock = <66666666>;	/* ToDo: Replace by DM clock driver */
 };
 
 &scif2_pins {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &usbhs0 {

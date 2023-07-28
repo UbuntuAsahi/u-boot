@@ -7,6 +7,6 @@
 
 / {
 	ocp {
-		bootph-all;
+		u-boot,dm-pre-reloc;
 	};
 };

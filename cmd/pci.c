@@ -517,7 +517,6 @@ static int do_pci(struct cmd_tbl *cmdtp, int flag, int argc, char *const argv[])
 			addr = hextoul(argv[3], NULL);
 		if (argc > 4)
 			value = hextoul(argv[4], NULL);
-		fallthrough;
 	case 'h':		/* header */
 	case 'b':		/* bars */
 		if (argc < 3)

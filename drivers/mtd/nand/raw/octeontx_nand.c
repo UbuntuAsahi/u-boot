@@ -354,7 +354,7 @@ struct octeontx_probe_device {
 
 static struct bch_vf *bch_vf;
 /** Deferred devices due to BCH not being ready */
-static LIST_HEAD(octeontx_pci_nand_deferred_devices);
+LIST_HEAD(octeontx_pci_nand_deferred_devices);
 
 /** default parameters used for probing chips */
 #define MAX_ONFI_MODE	5

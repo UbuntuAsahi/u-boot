@@ -102,7 +102,7 @@
 	};
 
 	zynqmp_ipi: zynqmp_ipi {
-		bootph-all;
+		u-boot,dm-pre-reloc;
 		compatible = "xlnx,zynqmp-ipi-mailbox";
 		interrupt-parent = <&gic>;
 		interrupts = <0 35 4>;
@@ -112,7 +112,7 @@
 		ranges;
 
 		ipi_mailbox_pmu1: mailbox@ff990400 {
-			bootph-all;
+			u-boot,dm-pre-reloc;
 			reg = <0x0 0xff9905c0 0x0 0x20>,
 			      <0x0 0xff9905e0 0x0 0x20>,
 			      <0x0 0xff990e80 0x0 0x20>,
@@ -129,7 +129,7 @@
 	dcc: dcc {
 		compatible = "arm,dcc";
 		status = "disabled";
-		bootph-all;
+		u-boot,dm-pre-reloc;
 	};
 
 	pmu {
@@ -147,19 +147,14 @@
 	};
 
 	firmware {
-		optee: optee  {
-			compatible = "linaro,optee-tz";
-			method = "smc";
-		};
-
 		zynqmp_firmware: zynqmp-firmware {
 			compatible = "xlnx,zynqmp-firmware";
 			#power-domain-cells = <1>;
 			method = "smc";
-			bootph-all;
+			u-boot,dm-pre-reloc;
 
 			zynqmp_power: zynqmp-power {
-				bootph-all;
+				u-boot,dm-pre-reloc;
 				compatible = "xlnx,zynqmp-power";
 				interrupt-parent = <&gic>;
 				interrupts = <0 35 4>;
@@ -228,7 +223,7 @@
 
 	amba: axi {
 		compatible = "simple-bus";
-		bootph-all;
+		u-boot,dm-pre-reloc;
 		#address-cells = <2>;
 		#size-cells = <2>;
 		ranges;
@@ -534,7 +529,7 @@
 		};
 
 		gem0: ethernet@ff0b0000 {
-			compatible = "xlnx,zynqmp-gem", "cdns,gem";
+			compatible = "xlnx,zynqmp-gem", "cdns,zynqmp-gem", "cdns,gem";
 			status = "disabled";
 			interrupt-parent = <&gic>;
 			interrupts = <0 57 4>, <0 57 4>;
@@ -549,7 +544,7 @@
 		};
 
 		gem1: ethernet@ff0c0000 {
-			compatible = "xlnx,zynqmp-gem", "cdns,gem";
+			compatible = "xlnx,zynqmp-gem", "cdns,zynqmp-gem", "cdns,gem";
 			status = "disabled";
 			interrupt-parent = <&gic>;
 			interrupts = <0 59 4>, <0 59 4>;
@@ -564,7 +559,7 @@
 		};
 
 		gem2: ethernet@ff0d0000 {
-			compatible = "xlnx,zynqmp-gem", "cdns,gem";
+			compatible = "xlnx,zynqmp-gem", "cdns,zynqmp-gem", "cdns,gem";
 			status = "disabled";
 			interrupt-parent = <&gic>;
 			interrupts = <0 61 4>, <0 61 4>;
@@ -579,7 +574,7 @@
 		};
 
 		gem3: ethernet@ff0e0000 {
-			compatible = "xlnx,zynqmp-gem", "cdns,gem";
+			compatible = "xlnx,zynqmp-gem", "cdns,zynqmp-gem", "cdns,gem";
 			status = "disabled";
 			interrupt-parent = <&gic>;
 			interrupts = <0 63 4>, <0 63 4>;
@@ -674,7 +669,7 @@
 		};
 
 		qspi: spi@ff0f0000 {
-			bootph-all;
+			u-boot,dm-pre-reloc;
 			compatible = "xlnx,zynqmp-qspi-1.0";
 			status = "disabled";
 			clock-names = "ref_clk", "pclk";
@@ -722,7 +717,7 @@
 		};
 
 		sdhci0: mmc@ff160000 {
-			bootph-all;
+			u-boot,dm-pre-reloc;
 			compatible = "xlnx,zynqmp-8.9a", "arasan,sdhci-8.9a";
 			status = "disabled";
 			interrupt-parent = <&gic>;
@@ -737,7 +732,7 @@
 		};
 
 		sdhci1: mmc@ff170000 {
-			bootph-all;
+			u-boot,dm-pre-reloc;
 			compatible = "xlnx,zynqmp-8.9a", "arasan,sdhci-8.9a";
 			status = "disabled";
 			interrupt-parent = <&gic>;
@@ -830,7 +825,7 @@
 		};
 
 		uart0: serial@ff000000 {
-			bootph-all;
+			u-boot,dm-pre-reloc;
 			compatible = "xlnx,zynqmp-uart", "cdns,uart-r1p12";
 			status = "disabled";
 			interrupt-parent = <&gic>;
@@ -841,7 +836,7 @@
 		};
 
 		uart1: serial@ff010000 {
-			bootph-all;
+			u-boot,dm-pre-reloc;
 			compatible = "xlnx,zynqmp-uart", "cdns,uart-r1p12";
 			status = "disabled";
 			interrupt-parent = <&gic>;
@@ -879,7 +874,6 @@
 				snps,enable_guctl1_resume_quirk;
 				snps,enable_guctl1_ipd_quirk;
 				snps,xhci-stream-quirk;
-				snps,resume-hs-terminations;
 				/* dma-coherent; */
 			};
 		};
@@ -911,7 +905,6 @@
 				snps,enable_guctl1_resume_quirk;
 				snps,enable_guctl1_ipd_quirk;
 				snps,xhci-stream-quirk;
-				snps,resume-hs-terminations;
 				/* dma-coherent; */
 			};
 		};
@@ -975,7 +968,7 @@
 		};
 
 		zynqmp_dpsub: display@fd4a0000 {
-			bootph-all;
+			u-boot,dm-pre-reloc;
 			compatible = "xlnx,zynqmp-dpsub-1.7";
 			status = "disabled";
 			reg = <0x0 0xfd4a0000 0x0 0x1000>,

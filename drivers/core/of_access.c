@@ -33,7 +33,7 @@
 DECLARE_GLOBAL_DATA_PTR;
 
 /* list of struct alias_prop aliases */
-static LIST_HEAD(aliases_lookup);
+LIST_HEAD(aliases_lookup);
 
 /* "/aliaes" node */
 static struct device_node *of_aliases;

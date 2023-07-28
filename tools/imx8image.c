@@ -30,7 +30,7 @@ static void imx8image_set_header(void *ptr, struct stat *sbuf, int ifd,
 {
 }
 
-static void imx8image_print_header(const void *ptr, struct image_tool_params *params)
+static void imx8image_print_header(const void *ptr)
 {
 }
 
@@ -829,6 +829,7 @@ static int build_container(soc_type_t soc, uint32_t sector_size,
 	int ret;
 
 	int container = -1;
+	int cont_img_count = 0; /* indexes to arrange the container */
 
 	memset((char *)&imx_header, 0, sizeof(imx_header_v3_t));
 
@@ -878,6 +879,7 @@ static int build_container(soc_type_t soc, uint32_t sector_size,
 			img_sp->src = file_off;
 
 			file_off += ALIGN(sbuf.st_size, sector_size);
+			cont_img_count++;
 			break;
 
 		case SECO:
@@ -897,6 +899,7 @@ static int build_container(soc_type_t soc, uint32_t sector_size,
 			img_sp->src = file_off;
 
 			file_off += sbuf.st_size;
+			cont_img_count++;
 			break;
 
 		case NEW_CONTAINER:
@@ -905,6 +908,8 @@ static int build_container(soc_type_t soc, uint32_t sector_size,
 				      CONTAINER_ALIGNMENT,
 				      CONTAINER_FLAGS_DEFAULT,
 				      fuse_version);
+			/* reset img count when moving to new container */
+			cont_img_count = 0;
 			scfw_flags = 0;
 			break;
 

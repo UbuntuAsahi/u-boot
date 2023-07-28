@@ -15,113 +15,113 @@
 	};
 
 	memory@80000000 {
-		bootph-pre-ram;
+		u-boot,dm-spl;
 	};
 };
 
 &cbass_main{
-	bootph-pre-ram;
+	u-boot,dm-spl;
 
 	timer1: timer@2400000 {
 		compatible = "ti,omap5430-timer";
 		reg = <0x00 0x2400000 0x00 0x80>;
 		ti,timer-alwon;
 		clock-frequency = <25000000>;
-		bootph-pre-ram;
+		u-boot,dm-spl;
 	};
 };
 
 &dmss {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &secure_proxy_main {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &dmsc {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &k3_pds {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &k3_clks {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &k3_reset {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &wkup_conf {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &chipid {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &main_pmx0 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &main_uart0 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &main_uart0_pins_default {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &main_uart1 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &cbass_mcu {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &cbass_wakeup {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &mcu_pmx0 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &wkup_uart0 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &sdhci1 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &main_mmc1_pins_default {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &fss {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &ospi0_pins_default {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &ospi0 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 
 	flash@0 {
-		bootph-pre-ram;
+		u-boot,dm-spl;
 
 		partitions {
-			bootph-pre-ram;
+			u-boot,dm-spl;
 
 			partition@3fc0000 {
-				bootph-pre-ram;
+				u-boot,dm-spl;
 			};
 		};
 	};
@@ -132,17 +132,17 @@
 	      <0x0 0x43000200 0x0 0x8>;
 	reg-names = "cpsw_nuss", "mac_efuse";
 	/delete-property/ ranges;
-	bootph-pre-ram;
+	u-boot,dm-spl;
 
 	cpsw-phy-sel@04044 {
 		compatible = "ti,am64-phy-gmii-sel";
 		reg = <0x0 0x00104044 0x0 0x8>;
-		bootph-pre-ram;
+		u-boot,dm-spl;
 	};
 };
 
 &cpsw_port1 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &cpsw_port2 {

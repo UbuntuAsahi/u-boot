@@ -7,18 +7,18 @@
 
 / {
 	soc {
-		bootph-all;
+		u-boot,dm-pre-reloc;
 
 		pinctrl_north@1300000 {
-			bootph-all;
+			u-boot,dm-pre-reloc;
 		};
 
 		clock-controller@1800000 {
-			bootph-all;
+			u-boot,dm-pre-reloc;
 		};
 
 		serial@78b1000 {
-			bootph-all;
+			u-boot,dm-pre-reloc;
 		};
 	};
 };

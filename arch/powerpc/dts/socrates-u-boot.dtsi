@@ -16,7 +16,7 @@
 
 	soc8544@e0000000 {
 		i2c@3000 {
-			bootph-all;
+			u-boot,dm-pre-reloc;
 
 			i2c_eeprom0: eeprom@51{
 				compatible = "atmel,24c64";
@@ -34,7 +34,7 @@
 };
 
 &serial0 {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 	clock-frequency = <333333330>;
 };
 

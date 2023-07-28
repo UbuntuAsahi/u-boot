@@ -127,9 +127,7 @@
 	static char start[0] __aligned(CONFIG_LINKER_LIST_ALIGN)	\
 		__attribute__((unused))					\
 		__section("__u_boot_list_2_"#_list"_1");			\
-	_type * tmp = (_type *)&start;					\
-	asm("":"+r"(tmp));						\
-	tmp;								\
+	(_type *)&start;						\
 })
 
 /**
@@ -155,9 +153,7 @@
 ({									\
 	static char end[0] __aligned(4) __attribute__((unused))		\
 		__section("__u_boot_list_2_"#_list"_3");			\
-	_type * tmp = (_type *)&end;					\
-	asm("":"+r"(tmp));						\
-	tmp;								\
+	(_type *)&end;							\
 })
 /**
  * ll_entry_count() - Return the number of elements in linker-generated array
@@ -251,9 +247,7 @@
 ({									\
 	static char start[0] __aligned(4) __attribute__((unused))	\
 		__section("__u_boot_list_1");				\
-	_type * tmp = (_type *)&start;					\
-	asm("":"+r"(tmp));						\
-	tmp;								\
+	(_type *)&start;						\
 })
 
 /**
@@ -276,9 +270,7 @@
 ({									\
 	static char end[0] __aligned(4) __attribute__((unused))		\
 		__section("__u_boot_list_3");				\
-	_type * tmp = (_type *)&end;					\
-	asm("":"+r"(tmp));						\
-	tmp;								\
+	(_type *)&end;							\
 })
 
 #endif /* __ASSEMBLY__ */

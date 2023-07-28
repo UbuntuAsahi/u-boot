@@ -30,7 +30,7 @@ static int xway_config(struct phy_device *phydev)
 	return 0;
 }
 
-U_BOOT_PHY_DRIVER(xway) = {
+static struct phy_driver XWAY_driver = {
 	.name = "XWAY",
 	.uid = 0xD565A400,
 	.mask = 0xffffff00,
@@ -39,3 +39,10 @@ U_BOOT_PHY_DRIVER(xway) = {
 	.startup = genphy_startup,
 	.shutdown = genphy_shutdown,
 };
+
+int phy_xway_init(void)
+{
+	phy_register(&XWAY_driver);
+
+	return 0;
+}

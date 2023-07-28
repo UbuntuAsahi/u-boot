@@ -11,14 +11,11 @@
 #ifndef _USB_H_
 #define _USB_H_
 
-#include <stdbool.h>
 #include <fdtdec.h>
 #include <usb_defs.h>
 #include <linux/usb/ch9.h>
 #include <asm/cache.h>
 #include <part.h>
-
-extern bool usb_started; /* flag for the started/stopped USB status */
 
 /*
  * The EHCI spec says that we must align to at least 32 bytes.  However,
@@ -184,9 +181,10 @@ int usb_reset_root_port(struct usb_device *dev);
 #endif
 
 int submit_bulk_msg(struct usb_device *dev, unsigned long pipe,
-			void *buffer, int transfer_len);
+			void *buffer, int transfer_len, int timeout);
 int submit_control_msg(struct usb_device *dev, unsigned long pipe, void *buffer,
-			int transfer_len, struct devrequest *setup);
+			int transfer_len, struct devrequest *setup,
+			int timeout);
 int submit_int_msg(struct usb_device *dev, unsigned long pipe, void *buffer,
 			int transfer_len, int interval, bool nonblock);
 
@@ -702,14 +700,15 @@ struct dm_usb_ops {
 	 */
 	int (*control)(struct udevice *bus, struct usb_device *udev,
 		       unsigned long pipe, void *buffer, int length,
-		       struct devrequest *setup);
+		       struct devrequest *setup, int timeout);
 	/**
 	 * bulk() - Send a bulk message
 	 *
 	 * Parameters are as above.
 	 */
 	int (*bulk)(struct udevice *bus, struct usb_device *udev,
-		    unsigned long pipe, void *buffer, int length);
+		    unsigned long pipe, void *buffer, int length,
+		    int timeout);
 	/**
 	 * interrupt() - Send an interrupt message
 	 *

@@ -133,6 +133,6 @@ struct zynqmp_header {
 };
 
 void zynqmpimage_default_header(struct zynqmp_header *ptr);
-void zynqmpimage_print_header(const void *ptr, struct image_tool_params *params);
+void zynqmpimage_print_header(const void *ptr);
 
 #endif /* _ZYNQMPIMAGE_H_ */

@@ -5,12 +5,12 @@
 
 /{
 	soc {
-		bootph-all;
+		u-boot,dm-pre-reloc;
 	};
 };
 
 &i2c1 {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &usb_phy {

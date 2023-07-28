@@ -62,11 +62,11 @@
 };
 
 &gpio1 {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &gpio3 {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 
 	/*
 	 * The Qseven BIOS_DISABLE signal on the RK3399-Q7 keeps the on-module
@@ -75,7 +75,7 @@
 	 * eMMC and SPI after the SPL has been booted from SD Card.
 	 */
 	bios_disable_override {
-		bootph-all;
+		u-boot,dm-pre-reloc;
 		gpios = <RK_PD5 GPIO_ACTIVE_LOW>;
 		output-high;
 		line-name = "bios_disable_override";
@@ -84,29 +84,29 @@
 };
 
 &gpio4 {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &norflash {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &pcfg_pull_none {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &pcfg_pull_up {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &sdmmc_bus4 {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &sdmmc_clk {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &sdmmc_cmd {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };

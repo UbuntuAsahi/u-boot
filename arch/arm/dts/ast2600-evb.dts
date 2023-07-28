@@ -58,7 +58,7 @@
 };
 
 &uart5 {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 	status = "okay";
 };
 
@@ -258,11 +258,11 @@
 };
 
 &hace {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 	status = "okay";
 };
 
 &acry {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 	status = "okay";
 };

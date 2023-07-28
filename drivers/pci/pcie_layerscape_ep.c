@@ -250,13 +250,13 @@ static int ls_pcie_ep_probe(struct udevice *dev)
 
 	pcie_ep->pcie = pcie;
 
-	pcie->dbi = devfdt_get_addr_index_ptr(dev, 0);
+	pcie->dbi = (void __iomem *)devfdt_get_addr_index(dev, 0);
 	if (!pcie->dbi)
-		return -EINVAL;
+		return -ENOMEM;
 
-	pcie->ctrl = devfdt_get_addr_index_ptr(dev, 1);
+	pcie->ctrl = (void __iomem *)devfdt_get_addr_index(dev, 1);
 	if (!pcie->ctrl)
-		return -EINVAL;
+		return -ENOMEM;
 
 	ret = fdt_get_named_resource(gd->fdt_blob, dev_of_offset(dev),
 				     "reg", "reg-names",

@@ -30,19 +30,19 @@
 };
 
 &gpio0 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &pinctrl {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &sdmmc0m1_pin {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &pcfg_pull_up_4ma {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &usb_host0_xhci {
@@ -52,5 +52,5 @@
 
 /* Need this and all the pinctrl/gpio stuff above to set pinmux */
 &vcc_sd {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };

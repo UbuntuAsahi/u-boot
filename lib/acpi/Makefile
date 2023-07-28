@@ -1,10 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0+
 #
 
-obj-y += acpi.o
-
-ifdef CONFIG_$(SPL_TPL_)GENERATE_ACPI_TABLE
-
 obj-$(CONFIG_$(SPL_)ACPIGEN) += acpigen.o
 obj-$(CONFIG_$(SPL_)ACPIGEN) += acpi_device.o
 obj-$(CONFIG_$(SPL_)ACPIGEN) += acpi_dp.o
@@ -25,5 +21,3 @@ endif
 obj-y += facs.o
 obj-y += ssdt.o
 endif
-
-endif # GENERATE_ACPI_TABLE

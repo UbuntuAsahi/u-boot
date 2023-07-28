@@ -58,9 +58,8 @@ config RNG_ROCKCHIP
 	bool "Enable random number generator for rockchip crypto rng"
 	depends on ARCH_ROCKCHIP && DM_RNG
 	help
-	  Enable random number generator for rockchip. This driver
-	  supports the rng module of crypto v1, crypto v2, and the
-	  trng module of the rk3588 series.
+	  Enable random number generator for rockchip.This driver is
+	  support rng module of crypto v1 and crypto v2.
 
 config RNG_IPROC200
 	bool "Broadcom iProc RNG200 random number generator"

@@ -310,7 +310,7 @@ static int ravb_phy_config(struct udevice *dev)
 	struct ravb_priv *eth = dev_get_priv(dev);
 	struct eth_pdata *pdata = dev_get_plat(dev);
 	struct phy_device *phydev;
-	int reg;
+	int mask = 0xffffffff, reg;
 
 	if (dm_gpio_is_valid(&eth->reset_gpio)) {
 		dm_gpio_set_value(&eth->reset_gpio, 1);
@@ -319,9 +319,11 @@ static int ravb_phy_config(struct udevice *dev)
 		mdelay(1);
 	}
 
-	phydev = phy_connect(eth->bus, -1, dev, pdata->phy_interface);
+	phydev = phy_find_by_mask(eth->bus, mask);
 	if (!phydev)
 		return -ENODEV;
+
+	phy_connect_dev(phydev, dev, pdata->phy_interface);
 
 	eth->phydev = phydev;
 
@@ -692,7 +694,6 @@ int ravb_of_to_plat(struct udevice *dev)
 
 static const struct udevice_id ravb_ids[] = {
 	{ .compatible = "renesas,etheravb-rcar-gen3" },
-	{ .compatible = "renesas,etheravb-rcar-gen4" },
 	{ }
 };
 

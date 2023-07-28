@@ -23,6 +23,7 @@
 #include <spi_flash.h>
 
 #include <asm/io.h>
+#include <asm/arch/sys_proto.h>
 #include "common.h"
 
 DECLARE_GLOBAL_DATA_PTR;

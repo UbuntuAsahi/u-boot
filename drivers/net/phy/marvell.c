@@ -7,7 +7,6 @@
  */
 #include <common.h>
 #include <errno.h>
-#include <marvell_phy.h>
 #include <phy.h>
 #include <linux/bitops.h>
 #include <linux/delay.h>
@@ -694,90 +693,90 @@ static int m88e1680_config(struct phy_device *phydev)
 	return 0;
 }
 
-U_BOOT_PHY_DRIVER(m88e1011s) = {
+static struct phy_driver M88E1011S_driver = {
 	.name = "Marvell 88E1011S",
-	.uid = MARVELL_PHY_ID_88E1101,
-	.mask = MARVELL_PHY_ID_MASK,
+	.uid = 0x1410c60,
+	.mask = 0xffffff0,
 	.features = PHY_GBIT_FEATURES,
 	.config = &m88e1011s_config,
 	.startup = &m88e1011s_startup,
 	.shutdown = &genphy_shutdown,
 };
 
-U_BOOT_PHY_DRIVER(m88e1111s) = {
+static struct phy_driver M88E1111S_driver = {
 	.name = "Marvell 88E1111S",
-	.uid = MARVELL_PHY_ID_88E1111,
-	.mask = MARVELL_PHY_ID_MASK,
+	.uid = 0x1410cc0,
+	.mask = 0xffffff0,
 	.features = PHY_GBIT_FEATURES,
 	.config = &m88e1111s_config,
 	.startup = &m88e1011s_startup,
 	.shutdown = &genphy_shutdown,
 };
 
-U_BOOT_PHY_DRIVER(m88e1118) = {
+static struct phy_driver M88E1118_driver = {
 	.name = "Marvell 88E1118",
-	.uid = MARVELL_PHY_ID_88E1118,
-	.mask = MARVELL_PHY_ID_MASK,
+	.uid = 0x1410e10,
+	.mask = 0xffffff0,
 	.features = PHY_GBIT_FEATURES,
 	.config = &m88e1118_config,
 	.startup = &m88e1118_startup,
 	.shutdown = &genphy_shutdown,
 };
 
-U_BOOT_PHY_DRIVER(m88e1118r) = {
+static struct phy_driver M88E1118R_driver = {
 	.name = "Marvell 88E1118R",
-	.uid = MARVELL_PHY_ID_88E1116R,
-	.mask = MARVELL_PHY_ID_MASK,
+	.uid = 0x1410e40,
+	.mask = 0xffffff0,
 	.features = PHY_GBIT_FEATURES,
 	.config = &m88e1118_config,
 	.startup = &m88e1118_startup,
 	.shutdown = &genphy_shutdown,
 };
 
-U_BOOT_PHY_DRIVER(m88e1121r) = {
+static struct phy_driver M88E1121R_driver = {
 	.name = "Marvell 88E1121R",
-	.uid = MARVELL_PHY_ID_88E1121R,
-	.mask = MARVELL_PHY_ID_MASK,
+	.uid = 0x1410cb0,
+	.mask = 0xffffff0,
 	.features = PHY_GBIT_FEATURES,
 	.config = &m88e1121_config,
 	.startup = &genphy_startup,
 	.shutdown = &genphy_shutdown,
 };
 
-U_BOOT_PHY_DRIVER(m88e1145) = {
+static struct phy_driver M88E1145_driver = {
 	.name = "Marvell 88E1145",
-	.uid = MARVELL_PHY_ID_88E1145,
-	.mask = MARVELL_PHY_ID_MASK,
+	.uid = 0x1410cd0,
+	.mask = 0xffffff0,
 	.features = PHY_GBIT_FEATURES,
 	.config = &m88e1145_config,
 	.startup = &m88e1145_startup,
 	.shutdown = &genphy_shutdown,
 };
 
-U_BOOT_PHY_DRIVER(m88e1149s) = {
+static struct phy_driver M88E1149S_driver = {
 	.name = "Marvell 88E1149S",
-	.uid = 0x01410ca0,
-	.mask = MARVELL_PHY_ID_MASK,
+	.uid = 0x1410ca0,
+	.mask = 0xffffff0,
 	.features = PHY_GBIT_FEATURES,
 	.config = &m88e1149_config,
 	.startup = &m88e1011s_startup,
 	.shutdown = &genphy_shutdown,
 };
 
-U_BOOT_PHY_DRIVER(m88e1240) = {
+static struct phy_driver M88E1240_driver = {
 	.name = "Marvell 88E1240",
-	.uid = MARVELL_PHY_ID_88E1240,
-	.mask = MARVELL_PHY_ID_MASK,
+	.uid = 0x1410e30,
+	.mask = 0xffffff0,
 	.features = PHY_GBIT_FEATURES,
 	.config = &m88e1240_config,
 	.startup = &m88e1011s_startup,
 	.shutdown = &genphy_shutdown,
 };
 
-U_BOOT_PHY_DRIVER(m88e151x) = {
+static struct phy_driver M88E151x_driver = {
 	.name = "Marvell 88E151x",
-	.uid = MARVELL_PHY_ID_88E1510,
-	.mask = MARVELL_PHY_ID_MASK,
+	.uid = 0x1410dd0,
+	.mask = 0xffffff0,
 	.features = PHY_GBIT_FEATURES,
 	.config = &m88e151x_config,
 	.startup = &m88e1011s_startup,
@@ -786,22 +785,39 @@ U_BOOT_PHY_DRIVER(m88e151x) = {
 	.writeext = &m88e1xxx_phy_extwrite,
 };
 
-U_BOOT_PHY_DRIVER(m88e1310) = {
+static struct phy_driver M88E1310_driver = {
 	.name = "Marvell 88E1310",
-	.uid = MARVELL_PHY_ID_88E1318S,
-	.mask = MARVELL_PHY_ID_MASK,
+	.uid = 0x01410e90,
+	.mask = 0xffffff0,
 	.features = PHY_GBIT_FEATURES,
 	.config = &m88e1310_config,
 	.startup = &m88e1011s_startup,
 	.shutdown = &genphy_shutdown,
 };
 
-U_BOOT_PHY_DRIVER(m88e1680) = {
+static struct phy_driver M88E1680_driver = {
 	.name = "Marvell 88E1680",
-	.uid = 0x01410ed0,
-	.mask = MARVELL_PHY_ID_MASK,
+	.uid = 0x1410ed0,
+	.mask = 0xffffff0,
 	.features = PHY_GBIT_FEATURES,
 	.config = &m88e1680_config,
 	.startup = &genphy_startup,
 	.shutdown = &genphy_shutdown,
 };
+
+int phy_marvell_init(void)
+{
+	phy_register(&M88E1310_driver);
+	phy_register(&M88E1149S_driver);
+	phy_register(&M88E1145_driver);
+	phy_register(&M88E1121R_driver);
+	phy_register(&M88E1118_driver);
+	phy_register(&M88E1118R_driver);
+	phy_register(&M88E1111S_driver);
+	phy_register(&M88E1011S_driver);
+	phy_register(&M88E1240_driver);
+	phy_register(&M88E151x_driver);
+	phy_register(&M88E1680_driver);
+
+	return 0;
+}

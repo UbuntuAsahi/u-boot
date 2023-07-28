@@ -9,74 +9,74 @@
 
 /{
 	ocp@68000000 {
-		bootph-pre-ram;
+		u-boot,dm-spl;
 
 		bandgap@48002524 {
-			bootph-pre-ram;
+			u-boot,dm-spl;
 		};
 	};
 };
 
 &uart1 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 	reg-shift = <2>;
 };
 
 &uart2 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 	reg-shift = <2>;
 };
 
 &uart3 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 	reg-shift = <2>;
 };
 
 &mmc1 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &mmc2 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &l4_core {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &scm {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &scm_conf {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &gpio1 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &gpio2 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &gpio3 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &gpio4 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &gpio5 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &gpio6 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &i2c1 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 	clock-frequency = <100000>;
 };

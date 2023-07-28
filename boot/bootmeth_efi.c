@@ -94,7 +94,7 @@ static int get_efi_pxe_vci(char *str, int max_len)
 	return 0;
 }
 
-static void set_efi_bootdev(struct blk_desc *desc, struct bootflow *bflow)
+static int efiload_read_file(struct blk_desc *desc, struct bootflow *bflow)
 {
 	const struct udevice *media_dev;
 	int size = bflow->size;
@@ -102,6 +102,11 @@ static void set_efi_bootdev(struct blk_desc *desc, struct bootflow *bflow)
 	char devnum_str[9];
 	char dirname[200];
 	char *last_slash;
+	int ret;
+
+	ret = bootmeth_alloc_file(bflow, 0x2000000, 0x10000);
+	if (ret)
+		return log_msg_ret("read", ret);
 
 	/*
 	 * This is a horrible hack to tell EFI about this boot device. Once we
@@ -112,9 +117,7 @@ static void set_efi_bootdev(struct blk_desc *desc, struct bootflow *bflow)
 	 * this can go away.
 	 */
 	media_dev = dev_get_parent(bflow->dev);
-	snprintf(devnum_str, sizeof(devnum_str), "%x:%x",
-		 desc ? desc->devnum : dev_seq(media_dev),
-		 bflow->part);
+	snprintf(devnum_str, sizeof(devnum_str), "%x", dev_seq(media_dev));
 
 	strlcpy(dirname, bflow->fname, sizeof(dirname));
 	last_slash = strrchr(dirname, '/');
@@ -127,15 +130,6 @@ static void set_efi_bootdev(struct blk_desc *desc, struct bootflow *bflow)
 	dev_name = device_get_uclass_id(media_dev) == UCLASS_MASS_STORAGE ?
 		 "usb" : dev_get_uclass_name(media_dev);
 	efi_set_bootdev(dev_name, devnum_str, bflow->fname, bflow->buf, size);
-}
-
-static int efiload_read_file(struct blk_desc *desc, struct bootflow *bflow)
-{
-	int ret;
-
-	ret = bootmeth_alloc_file(bflow, 0x2000000, 0x10000);
-	if (ret)
-		return log_msg_ret("read", ret);
 
 	return 0;
 }
@@ -153,60 +147,25 @@ static int distro_efi_check(struct udevice *dev, struct bootflow_iter *iter)
 	return 0;
 }
 
-/**
- * distro_efi_get_fdt_name() - Get the filename for reading the .dtb file
- *
- * @fname: Place to put filename
- * @size: Max size of filename
- * @seq: Sequence number, to cycle through options (0=first)
- * Returns: 0 on success, -ENOENT if the "fdtfile" env var does not exist,
- * -EINVAL if there are no more options, -EALREADY if the control FDT should be
- * used
- */
-static int distro_efi_get_fdt_name(char *fname, int size, int seq)
+static void distro_efi_get_fdt_name(char *fname, int size)
 {
 	const char *fdt_fname;
-	const char *prefix;
-
-	/* select the prefix */
-	switch (seq) {
-	case 0:
-		/* this is the default */
-		prefix = "/dtb";
-		break;
-	case 1:
-		prefix = "";
-		break;
-	case 2:
-		prefix = "/dtb/current";
-		break;
-	default:
-		return log_msg_ret("pref", -EINVAL);
-	}
 
 	fdt_fname = env_get("fdtfile");
 	if (fdt_fname) {
-		snprintf(fname, size, "%s/%s", prefix, fdt_fname);
+		snprintf(fname, size, "dtb/%s", fdt_fname);
 		log_debug("Using device tree: %s\n", fname);
-	} else if (IS_ENABLED(CONFIG_OF_HAS_PRIOR_STAGE)) {
-		strcpy(fname, "<prior>");
-		return log_msg_ret("pref", -EALREADY);
-	/* Use this fallback only for 32-bit ARM */
-	} else if (IS_ENABLED(CONFIG_ARM) && !IS_ENABLED(CONFIG_ARM64)) {
+	} else {
 		const char *soc = env_get("soc");
 		const char *board = env_get("board");
 		const char *boardver = env_get("boardver");
 
 		/* cf the code in label_boot() which seems very complex */
-		snprintf(fname, size, "%s/%s%s%s%s.dtb", prefix,
+		snprintf(fname, size, "dtb/%s%s%s%s.dtb",
 			 soc ? soc : "", soc ? "-" : "", board ? board : "",
 			 boardver ? boardver : "");
 		log_debug("Using default device tree: %s\n", fname);
-	} else {
-		return log_msg_ret("env", -ENOENT);
 	}
-
-	return 0;
 }
 
 static int distro_efi_read_bootflow_file(struct udevice *dev,
@@ -215,7 +174,7 @@ static int distro_efi_read_bootflow_file(struct udevice *dev,
 	struct blk_desc *desc = NULL;
 	ulong fdt_addr, size;
 	char fname[256];
-	int ret, seq;
+	int ret;
 
 	/* We require a partition table */
 	if (!bflow->part)
@@ -235,28 +194,15 @@ static int distro_efi_read_bootflow_file(struct udevice *dev,
 
 	ret = efiload_read_file(desc, bflow);
 	if (ret)
-		return log_msg_ret("read", ret);
+		return log_msg_ret("read", -EINVAL);
+
+	distro_efi_get_fdt_name(fname, sizeof(fname));
+	bflow->fdt_fname = strdup(fname);
+	if (!bflow->fdt_fname)
+		return log_msg_ret("fil", -ENOMEM);
 
 	fdt_addr = env_get_hex("fdt_addr_r", 0);
-
-	/* try the various available names */
-	ret = -ENOENT;
-	*fname = '\0';
-	for (seq = 0; ret == -ENOENT; seq++) {
-		ret = distro_efi_get_fdt_name(fname, sizeof(fname), seq);
-		if (ret == -EALREADY)
-			bflow->flags = BOOTFLOWF_USE_PRIOR_FDT;
-		if (!ret)
-			ret = bootmeth_common_read_file(dev, bflow, fname,
-							fdt_addr, &size);
-	}
-
-	if (*fname) {
-		bflow->fdt_fname = strdup(fname);
-		if (!bflow->fdt_fname)
-			return log_msg_ret("fil", -ENOMEM);
-	}
-
+	ret = bootmeth_common_read_file(dev, bflow, fname, fdt_addr, &size);
 	if (!ret) {
 		bflow->fdt_size = size;
 		bflow->fdt_addr = fdt_addr;
@@ -331,11 +277,7 @@ static int distro_efi_read_bootflow_net(struct bootflow *bflow)
 	fdt_addr = hextoul(fdt_addr_str, NULL);
 	sprintf(file_addr, "%lx", fdt_addr);
 
-	/* We only allow the first prefix with PXE */
-	ret = distro_efi_get_fdt_name(fname, sizeof(fname), 0);
-	if (ret)
-		return log_msg_ret("nam", ret);
-
+	distro_efi_get_fdt_name(fname, sizeof(fname));
 	bflow->fdt_fname = strdup(fname);
 	if (!bflow->fdt_fname)
 		return log_msg_ret("fil", -ENOMEM);
@@ -379,13 +321,6 @@ int distro_efi_boot(struct udevice *dev, struct bootflow *bflow)
 
 	/* A non-zero buffer indicates the kernel is there */
 	if (bflow->buf) {
-		/* Set the EFI bootdev again, since reading an FDT loses it! */
-		if (bflow->blk) {
-			struct blk_desc *desc = dev_get_uclass_plat(bflow->blk);
-
-			set_efi_bootdev(desc, bflow);
-		}
-
 		kernel = (ulong)map_to_sysmem(bflow->buf);
 
 		/*

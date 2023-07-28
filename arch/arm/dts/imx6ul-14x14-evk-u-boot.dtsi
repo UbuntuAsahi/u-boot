@@ -4,25 +4,25 @@
  */
 
 &{/aliases} {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 	display0 = &lcdif;
 };
 
 &soc {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &aips2 {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &iomuxc {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &lcdif {
 	display = <&display0>;
-	bootph-all;
+	u-boot,dm-pre-reloc;
 
 	display0: display@0 {
 		bits-per-pixel = <24>;

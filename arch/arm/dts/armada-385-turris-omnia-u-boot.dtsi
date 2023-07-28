@@ -12,24 +12,24 @@
 };
 
 &i2c0 {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 
 	i2cmux: i2cmux@70 {
-		bootph-all;
+		u-boot,dm-pre-reloc;
 
 		i2c@0 {
-			bootph-all;
+			u-boot,dm-pre-reloc;
 		};
 
 		i2c@1 {
-			bootph-all;
+			u-boot,dm-pre-reloc;
 		};
 
 		i2c@5 {
-			bootph-all;
+			u-boot,dm-pre-reloc;
 
 			crypto@64 {
-				bootph-all;
+				u-boot,dm-pre-reloc;
 			};
 		};
 	};

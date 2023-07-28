@@ -6,69 +6,69 @@
 
 / {
 	ocp {
-		bootph-all;
+		u-boot,dm-pre-reloc;
 	};
 };
 
 &l4_wkup {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 	segment@200000 {
-		bootph-all;
+		u-boot,dm-pre-reloc;
 		target-module@0
 		{
-			bootph-all;
+			u-boot,dm-pre-reloc;
 			compatible = "simple-bus";
 		};
 		target-module@7000 {
-			bootph-all;
+			u-boot,dm-pre-reloc;
 			compatible = "simple-bus";
 		};
 		target-module@9000 {
-			bootph-all;
+			u-boot,dm-pre-reloc;
 			compatible = "simple-bus";
 		};
 	};
 };
 
 &wkup_cm {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &l4_wkup_clkctrl {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &l4_per {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 	segment@0 {
-		bootph-all;
+		u-boot,dm-pre-reloc;
 		compatible = "simple-bus";
 		target-module@4c000 {
-			bootph-all;
+			u-boot,dm-pre-reloc;
 			compatible = "simple-bus";
 		};
 	};
 
 	segment@100000 {
-		bootph-all;
+		u-boot,dm-pre-reloc;
 		compatible = "simple-bus";
 		target-module@ac000 {
-			bootph-all;
+			u-boot,dm-pre-reloc;
 			compatible = "simple-bus";
 		};
 		target-module@ae000 {
-			bootph-all;
+			u-boot,dm-pre-reloc;
 			compatible = "simple-bus";
 		};
 	};
 };
 
 &prcm {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &gpio0_target {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &prcm_clocks {
@@ -80,33 +80,33 @@
 };
 
 &i2c0 {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &uart0 {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &mmc1 {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &mmc2 {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &gpio0 {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &gpio1 {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &gpio2 {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };
 
 &gpio3 {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };

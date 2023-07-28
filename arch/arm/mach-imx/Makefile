@@ -77,10 +77,6 @@ ifeq ($(CONFIG_SPL_BUILD),y)
 obj-$(CONFIG_SPL_LOAD_IMX_CONTAINER) += image-container.o parse-container.o
 endif
 
-ifeq ($(SOC),$(filter $(SOC),imx8ulp imx9))
-obj-$(CONFIG_AHAB_BOOT) += ele_ahab.o
-endif
-
 PLUGIN = board/$(BOARDDIR)/plugin
 
 ifeq ($(CONFIG_USE_IMXIMG_PLUGIN),y)
@@ -135,12 +131,6 @@ u-boot.imx: MKIMAGEOUTPUT = u-boot.imx.log
 
 u-boot.imx: u-boot.bin u-boot.cfgout $(PLUGIN).bin FORCE
 	$(call if_changed,mkimage)
-
-quiet_cmd_u-boot-nand_imx = GEN     $@
-cmd_u-boot-nand_imx = (dd bs=1024 count=1 if=/dev/zero 2>/dev/null) | cat - $< > $@
-
-u-boot-nand.imx: u-boot.imx FORCE
-	$(call if_changed,u-boot-nand_imx)
 
 ifeq ($(CONFIG_MULTI_DTB_FIT),y)
 MKIMAGEFLAGS_u-boot-dtb.imx = -n $(filter-out $(PLUGIN).bin $< $(PHONY),$^) \

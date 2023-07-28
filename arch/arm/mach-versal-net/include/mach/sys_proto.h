@@ -8,4 +8,9 @@
 
 void mem_map_fill(void);
 
-int zynqmp_mmio_write(const u32 address, const u32 mask, const u32 value);
+static inline int zynqmp_mmio_write(const u32 address, const u32 mask,
+				    const u32 value)
+{
+	BUILD_BUG();
+	return -EINVAL;
+}

@@ -598,7 +598,7 @@ int aquantia_startup(struct phy_device *phydev)
 	return 0;
 }
 
-U_BOOT_PHY_DRIVER(aq1202) = {
+struct phy_driver aq1202_driver = {
 	.name = "Aquantia AQ1202",
 	.uid = 0x3a1b445,
 	.mask = 0xfffffff0,
@@ -611,7 +611,7 @@ U_BOOT_PHY_DRIVER(aq1202) = {
 	.shutdown = &gen10g_shutdown,
 };
 
-U_BOOT_PHY_DRIVER(aq2104) = {
+struct phy_driver aq2104_driver = {
 	.name = "Aquantia AQ2104",
 	.uid = 0x3a1b460,
 	.mask = 0xfffffff0,
@@ -624,7 +624,7 @@ U_BOOT_PHY_DRIVER(aq2104) = {
 	.shutdown = &gen10g_shutdown,
 };
 
-U_BOOT_PHY_DRIVER(aqr105) = {
+struct phy_driver aqr105_driver = {
 	.name = "Aquantia AQR105",
 	.uid = 0x3a1b4a2,
 	.mask = 0xfffffff0,
@@ -638,7 +638,7 @@ U_BOOT_PHY_DRIVER(aqr105) = {
 	.data = AQUANTIA_GEN1,
 };
 
-U_BOOT_PHY_DRIVER(aqr106) = {
+struct phy_driver aqr106_driver = {
 	.name = "Aquantia AQR106",
 	.uid = 0x3a1b4d0,
 	.mask = 0xfffffff0,
@@ -651,7 +651,7 @@ U_BOOT_PHY_DRIVER(aqr106) = {
 	.shutdown = &gen10g_shutdown,
 };
 
-U_BOOT_PHY_DRIVER(aqr107) = {
+struct phy_driver aqr107_driver = {
 	.name = "Aquantia AQR107",
 	.uid = 0x3a1b4e0,
 	.mask = 0xfffffff0,
@@ -665,7 +665,7 @@ U_BOOT_PHY_DRIVER(aqr107) = {
 	.data = AQUANTIA_GEN2,
 };
 
-U_BOOT_PHY_DRIVER(aqr112) = {
+struct phy_driver aqr112_driver = {
 	.name = "Aquantia AQR112",
 	.uid = 0x3a1b660,
 	.mask = 0xfffffff0,
@@ -679,7 +679,7 @@ U_BOOT_PHY_DRIVER(aqr112) = {
 	.data = AQUANTIA_GEN3,
 };
 
-U_BOOT_PHY_DRIVER(aqr113c) = {
+struct phy_driver aqr113c_driver = {
 	.name = "Aquantia AQR113C",
 	.uid = 0x31c31c12,
 	.mask = 0xfffffff0,
@@ -693,7 +693,7 @@ U_BOOT_PHY_DRIVER(aqr113c) = {
 	.data = AQUANTIA_GEN3,
 };
 
-U_BOOT_PHY_DRIVER(aqr405) = {
+struct phy_driver aqr405_driver = {
 	.name = "Aquantia AQR405",
 	.uid = 0x3a1b4b2,
 	.mask = 0xfffffff0,
@@ -707,7 +707,7 @@ U_BOOT_PHY_DRIVER(aqr405) = {
 	.data = AQUANTIA_GEN1,
 };
 
-U_BOOT_PHY_DRIVER(aqr412) = {
+struct phy_driver aqr412_driver = {
 	.name = "Aquantia AQR412",
 	.uid = 0x3a1b710,
 	.mask = 0xfffffff0,
@@ -720,3 +720,18 @@ U_BOOT_PHY_DRIVER(aqr412) = {
 	.shutdown = &gen10g_shutdown,
 	.data = AQUANTIA_GEN3,
 };
+
+int phy_aquantia_init(void)
+{
+	phy_register(&aq1202_driver);
+	phy_register(&aq2104_driver);
+	phy_register(&aqr105_driver);
+	phy_register(&aqr106_driver);
+	phy_register(&aqr107_driver);
+	phy_register(&aqr112_driver);
+	phy_register(&aqr113c_driver);
+	phy_register(&aqr405_driver);
+	phy_register(&aqr412_driver);
+
+	return 0;
+}

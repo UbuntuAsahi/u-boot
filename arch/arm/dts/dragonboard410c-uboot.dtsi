@@ -8,26 +8,26 @@
 / {
 
 	smem {
-		bootph-all;
+		u-boot,dm-pre-reloc;
 	};
 
 	soc {
-		bootph-all;
+		u-boot,dm-pre-reloc;
 
 		pinctrl@1000000 {
-			bootph-all;
+			u-boot,dm-pre-reloc;
 
 			uart {
-				bootph-all;
+				u-boot,dm-pre-reloc;
 			};
 		};
 
 		qcom,gcc@1800000 {
-			bootph-all;
+			u-boot,dm-pre-reloc;
 		};
 
 		serial@78b0000 {
-			bootph-all;
+			u-boot,dm-pre-reloc;
 		};
 	};
 };

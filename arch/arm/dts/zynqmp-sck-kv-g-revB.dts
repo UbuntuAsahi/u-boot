@@ -146,7 +146,7 @@
 	bus-width = <8>;
 };
 
-&gem3 {
+&gem3 { /* required by spec */
 	status = "okay";
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_gem3_default>;
@@ -172,7 +172,7 @@
 	};
 };
 
-&pinctrl0 {
+&pinctrl0 { /* required by spec */
 	status = "okay";
 
 	pinctrl_uart1_default: uart1-default {

@@ -584,7 +584,7 @@ static int am654_sdhci_of_to_plat(struct udevice *dev)
 	int ret;
 
 	host->name = dev->name;
-	host->ioaddr = dev_read_addr_ptr(dev);
+	host->ioaddr = (void *)dev_read_addr(dev);
 	plat->non_removable = dev_read_bool(dev, "non-removable");
 
 	if (plat->flags & DLL_PRESENT) {

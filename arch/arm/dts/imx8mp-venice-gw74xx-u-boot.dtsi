@@ -15,9 +15,15 @@
 
 	wdt-reboot {
 		compatible = "wdt-reboot";
-		bootph-pre-ram;
+		u-boot,dm-spl;
 		wdt = <&wdog1>;
 	};
+};
+
+&eqos {
+	/delete-property/ assigned-clocks;
+	/delete-property/ assigned-clock-parents;
+	/delete-property/ assigned-clock-rates;
 };
 
 &ethphy0 {
@@ -33,7 +39,7 @@
 };
 
 &gpio1 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 
 	dio0_hog {
 		gpio-hog;
@@ -51,7 +57,7 @@
 };
 
 &gpio2 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 
 	pcie1_wdis_hog {
 		gpio-hog;
@@ -76,7 +82,7 @@
 };
 
 &gpio3 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 
 	m2_dis2_hog {
 		gpio-hog;
@@ -101,7 +107,7 @@
 };
 
 &gpio4 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 
 	m2_dis1_hog {
 		gpio-hog;
@@ -119,7 +125,7 @@
 };
 
 &gpio5 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 
 	rs485_half {
 		gpio-hog;
@@ -137,23 +143,23 @@
 };
 
 &i2c1 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &i2c2 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &i2c3 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &pinctrl_i2c1 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &pinctrl_wdog {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &switch {
@@ -221,7 +227,7 @@
 	assigned-clocks = <&clk IMX8MP_CLK_USDHC2>;
 	sd-uhs-ddr50;
 	sd-uhs-sdr104;
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &usdhc3 {
@@ -230,9 +236,9 @@
 	assigned-clocks = <&clk IMX8MP_CLK_USDHC3>;
 	mmc-hs400-1_8v;
 	mmc-hs400-enhanced-strobe;
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };
 
 &wdog1 {
-	bootph-pre-ram;
+	u-boot,dm-spl;
 };

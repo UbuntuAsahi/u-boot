@@ -11,7 +11,6 @@ General
 
    codingstyle
    designprinciples
-   docstyle
    patman
    process
    release_cycle

@@ -1,4 +1,8 @@
-// SPDX-License-Identifier: GPL-2.0-only
+/*
+ * This file is licensed under the terms of the GNU General Public License
+ * version 2.  This program is licensed "as is" without any warranty of any
+ * kind, whether express or implied.
+ */
 
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/pinctrl/omap.h>
@@ -63,11 +67,8 @@
 		ranges;
 
 		prcm: prcm@48180000 {
-			compatible = "ti,dm816-prcm", "simple-bus";
+			compatible = "ti,dm816-prcm";
 			reg = <0x48180000 0x4000>;
-			#address-cells = <1>;
-			#size-cells = <1>;
-			ranges = <0 0x48180000 0x4000>;
 
 			prcm_clocks: clocks {
 				#address-cells = <1>;
@@ -89,8 +90,6 @@
 			dm816x_pinmux: pinmux@800 {
 				compatible = "pinctrl-single";
 				reg = <0x800 0x50a>;
-				#address-cells = <1>;
-				#size-cells = <0>;
 				#pinctrl-cells = <1>;
 				pinctrl-single,register-width = <16>;
 				pinctrl-single,function-mask = <0xf>;
@@ -126,8 +125,6 @@
 			};
 
 			scrm_clocks: clocks {
-				#address-cells = <1>;
-				#size-cells = <0>;
 			};
 
 			scrm_clockdomains: clockdomains {
@@ -235,7 +232,7 @@
 			#mbox-cells = <1>;
 			ti,mbox-num-users = <4>;
 			ti,mbox-num-fifos = <12>;
-			mbox_dsp: mbox-dsp {
+			mbox_dsp: mbox_dsp {
 				ti,mbox-tx = <3 0 0>;
 				ti,mbox-rx = <0 0 0>;
 			};
@@ -371,7 +368,7 @@
 			ti,timer-pwm;
 		};
 
-		uart1: serial@48020000 {
+		uart1: uart@48020000 {
 			compatible = "ti,am3352-uart", "ti,omap3-uart";
 			ti,hwmods = "uart1";
 			reg = <0x48020000 0x2000>;
@@ -381,7 +378,7 @@
 			dma-names = "tx", "rx";
 		};
 
-		uart2: serial@48022000 {
+		uart2: uart@48022000 {
 			compatible = "ti,am3352-uart", "ti,omap3-uart";
 			ti,hwmods = "uart2";
 			reg = <0x48022000 0x2000>;
@@ -391,7 +388,7 @@
 			dma-names = "tx", "rx";
 		};
 
-		uart3: serial@48024000 {
+		uart3: uart@48024000 {
 			compatible = "ti,am3352-uart", "ti,omap3-uart";
 			ti,hwmods = "uart3";
 			reg = <0x48024000 0x2000>;

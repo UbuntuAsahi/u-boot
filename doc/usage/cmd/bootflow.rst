@@ -148,7 +148,7 @@ Name       mmc\@7e202000.bootdev.part_2
 Device     mmc\@7e202000.bootdev
 Block dev  mmc\@7e202000.blk
 Type       distro
-Method:    extlinux
+Method:    syslinux
 State      ready
 Partition  2
 Subdir     (none)

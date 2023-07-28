@@ -7,10 +7,10 @@
 
 /{
 	ocp {
-		bootph-all;
+		u-boot,dm-pre-reloc;
 	};
 };
 
 &i2c0 {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 };

@@ -201,10 +201,7 @@ static int meson_serial_pending(struct udevice *dev, bool input)
 
 		return true;
 	} else {
-		if (status & AML_UART_TX_EMPTY)
-			return false;
-
-		return true;
+		return !(status & AML_UART_TX_FULL);
 	}
 }
 

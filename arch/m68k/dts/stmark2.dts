@@ -16,7 +16,7 @@
 };
 
 &uart0 {
-	bootph-all;
+	u-boot,dm-pre-reloc;
 	status = "okay";
 };
 
@@ -40,8 +40,4 @@
 &fec1 {
 	status = "okay";
 	mii-base = <0>;
-};
-
-&i2c0 {
-	status = "okay";
 };
