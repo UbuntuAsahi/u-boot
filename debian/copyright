@@ -1,8 +1,6 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: Das U-Boot
 Source: https://github.com/AsahiLinux/u-boot
-Files-Excluded:
-  drivers/dma/MCD_tasks.c
 
 Files: *
 Copyright: 2000-2013 Wolfgang Denk <wd@denx.de>
@@ -119,9 +117,10 @@ Files:
 Copyright:
  The Asahi Linux Contributors
  2021 Mark Kettenis <kettenis@openbsd.org>
-License: GPL-2.0+ or MIT
+License: GPL-2+ or MIT
 
 Files: 
+ drivers/dma/MCD_tasks.c
  drivers/tpm/tpm_atmel_twi.c
  drivers/gpio/tca642x.c
  include/splash.h
