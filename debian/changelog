@@ -1,5 +1,5 @@
 u-boot-asahi (2023.04-2-1) unstable; urgency=medium
 
-  * Initial packaging (Closes #1042471)
+  * Initial packaging (Closes: #1042471)
 
  -- Tobias Heider <me@tobhe.de>  Fri, 28 Jul 2023 16:15:24 +0200
