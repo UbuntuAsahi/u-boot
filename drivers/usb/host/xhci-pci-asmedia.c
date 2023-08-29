@@ -36,13 +36,27 @@
 /* BAR0 registers */
 #define ASMT_REG_ADDR			0x3000
 
-#define ASMT_REG_DATA			0x3004
+#define ASMT_REG_WDATA			0x3004
+#define ASMT_REG_RDATA			0x3008
 
 #define ASMT_REG_STATUS			0x3009
 #define ASMT_REG_STATUS_BUSY		BIT(7)
 
-#define ASMT_REG_WDATA			0x3010
-#define ASMT_REG_RDATA			0x3018
+#define ASMT_REG_CODE_WDATA		0x3010
+#define ASMT_REG_CODE_RDATA		0x3018
+
+#define ASMT_MMIO_CPU_MISC		0x500e
+#define ASMT_MMIO_CPU_MISC_CODE_RAM_WR	BIT(0)
+
+#define ASMT_MMIO_CPU_MODE_NEXT		0x5040
+#define ASMT_MMIO_CPU_MODE_CUR		0x5041
+
+#define ASMT_MMIO_CPU_MODE_RAM		BIT(0)
+#define ASMT_MMIO_CPU_MODE_HALFSPEED	BIT(1)
+
+#define ASMT_MMIO_CPU_EXEC_CTRL		0x5042
+#define ASMT_MMIO_CPU_EXEC_CTRL_RESET	BIT(0)
+#define ASMT_MMIO_CPU_EXEC_CTRL_HALT	BIT(1)
 
 #define TIMEOUT_USEC			10000
 #define RESET_TIMEOUT_USEC		500000
@@ -171,11 +185,42 @@ static int asmedia_wait_reset(struct udevice *pdev, struct xhci_hcor *hcor)
 	return ret;
 }
 
-static void asmedia_write_reg(struct udevice *pdev, struct xhci_hccr *hccr,
-			      u16 addr, u8 data) {
+static u8 asmedia_read_reg(struct udevice *pdev, struct xhci_hccr *hccr,
+			   u16 addr) {
 	void __iomem *regs = (void *)hccr;
 	u8 status;
 	int ret;
+
+	ret = readb_poll_sleep_timeout(regs + ASMT_REG_STATUS, status,
+				       !(status & ASMT_REG_STATUS_BUSY),
+				       1000, TIMEOUT_USEC);
+
+	if (ret) {
+		dev_err(pdev,
+			"Read reg wait timed out ([%04x])\n", addr);
+		return ~0;
+	}
+
+	writew_relaxed(addr, regs + ASMT_REG_ADDR);
+
+	ret = readb_poll_sleep_timeout(regs + ASMT_REG_STATUS,  status,
+				       !(status & ASMT_REG_STATUS_BUSY),
+				       1000, TIMEOUT_USEC);
+
+	if (ret) {
+		dev_err(pdev,
+			"Read reg addr timed out ([%04x])\n", addr);
+		return ~0;
+	}
+
+	return readb_relaxed(regs + ASMT_REG_RDATA);
+}
+
+static void asmedia_write_reg(struct udevice *pdev, struct xhci_hccr *hccr,
+			      u16 addr, u8 data, bool wait) {
+	void __iomem *regs = (void *)hccr;
+	u8 status;
+	int ret, i;
 
 	writew_relaxed(addr, regs + ASMT_REG_ADDR);
 
@@ -185,10 +230,10 @@ static void asmedia_write_reg(struct udevice *pdev, struct xhci_hccr *hccr,
 
 	if (ret)
 		dev_err(pdev,
-			"Write addr timed out ([%04x] = %02x)\n",
+			"Write reg addr timed out ([%04x] = %02x)\n",
 			addr, data);
 
-	writeb_relaxed(data, regs + ASMT_REG_DATA);
+	writeb_relaxed(data, regs + ASMT_REG_WDATA);
 
 	ret = readb_poll_sleep_timeout(regs + ASMT_REG_STATUS, status,
 				       !(status & ASMT_REG_STATUS_BUSY),
@@ -196,8 +241,22 @@ static void asmedia_write_reg(struct udevice *pdev, struct xhci_hccr *hccr,
 
 	if (ret)
 		dev_err(pdev,
-			"Write data timed out ([%04x] = %02x)\n",
+			"Write reg data timed out ([%04x] = %02x)\n",
 			addr, data);
+
+	if (!wait)
+		return;
+
+	for (i = 0; i < TIMEOUT_USEC; i++) {
+		if (asmedia_read_reg(pdev, hccr, addr) == data)
+			break;
+	}
+
+	if (i >= TIMEOUT_USEC) {
+		dev_err(pdev,
+			"Verify register timed out ([%04x] = %02x)\n",
+			addr, data);
+	}
 }
 
 static int asmedia_load_fw(struct udevice *pdev, struct xhci_hccr *hccr,
@@ -205,13 +264,17 @@ static int asmedia_load_fw(struct udevice *pdev, struct xhci_hccr *hccr,
 {
 	void __iomem *regs = (void *)hccr;
 	const u16 *fw_data = (const u16 *)fwdata;
+	u16 raddr;
 	u32 data;
 	size_t index = 0, addr = 0;
 	size_t words = fwsize >> 1;
-	int ret;
+	int ret, i;
 
-	asmedia_write_reg(pdev, hccr, 0x5040, 2);
-	asmedia_write_reg(pdev, hccr, 0x5042, 1);
+	asmedia_write_reg(pdev, hccr, ASMT_MMIO_CPU_MODE_NEXT,
+			  ASMT_MMIO_CPU_MODE_HALFSPEED, false);
+
+	asmedia_write_reg(pdev,hccr, ASMT_MMIO_CPU_EXEC_CTRL,
+			  ASMT_MMIO_CPU_EXEC_CTRL_RESET, false);
 
 	ret = asmedia_wait_reset(pdev, hcor);
 	if (ret) {
@@ -219,7 +282,11 @@ static int asmedia_load_fw(struct udevice *pdev, struct xhci_hccr *hccr,
 		return ret;
 	}
 
-	asmedia_write_reg(pdev, hccr, 0x500e, 1);
+	asmedia_write_reg(pdev, hccr, ASMT_MMIO_CPU_EXEC_CTRL,
+			  ASMT_MMIO_CPU_EXEC_CTRL_HALT, false);
+
+	asmedia_write_reg(pdev, hccr, ASMT_MMIO_CPU_MISC,
+			  ASMT_MMIO_CPU_MISC_CODE_RAM_WR, true);
 
 	dm_pci_write_config8(pdev, ASMT_CFG_SRAM_ACCESS,
 			     ASMT_CFG_SRAM_ACCESS_ENABLE);
@@ -234,18 +301,34 @@ static int asmedia_load_fw(struct udevice *pdev, struct xhci_hccr *hccr,
 		dm_pci_write_config16(pdev, ASMT_CFG_SRAM_ADDR,
 				      addr);
 
-		writel_relaxed(data, regs + ASMT_REG_WDATA);
+		writel_relaxed(data, regs + ASMT_REG_CODE_WDATA);
+
+		for (i = 0; i < TIMEOUT_USEC; i++) {
+			dm_pci_read_config16(pdev, ASMT_CFG_SRAM_ADDR, &raddr);
+			if (raddr != addr)
+				break;
+			udelay(1);
+		}
+
+		if (raddr == addr) {
+			dev_err(pdev, "Word write timed out\n");
+			return -ETIMEDOUT;
+		}
 
 		if (++index & 0x4000)
 			index += 0x4000;
 		addr += 2;
 	}
 
-	asmedia_write_reg(pdev, hccr, 0x5040, 3);
-
 	dm_pci_write_config8(pdev, ASMT_CFG_SRAM_ACCESS, 0);
 
-	asmedia_write_reg(pdev, hccr, 0x500e, 0);
+	asmedia_write_reg(pdev, hccr, ASMT_MMIO_CPU_MISC, 0, true);
+
+	asmedia_write_reg(pdev, hccr, ASMT_MMIO_CPU_MODE_NEXT,
+			  ASMT_MMIO_CPU_MODE_RAM |
+			  ASMT_MMIO_CPU_MODE_HALFSPEED, false);
+
+	asmedia_write_reg(pdev, hccr, ASMT_MMIO_CPU_EXEC_CTRL, 0, false);
 
 	ret = asmedia_wait_reset(pdev, hcor);
 	if (ret) {
