@@ -1,3 +1,9 @@
+u-boot-asahi (2023.07.02-2-1) unstable; urgency=medium
+
+  * New upstream version 2023.07.02-2
+
+ -- Tobias Heider <me@tobhe.de>  Tue, 29 Aug 2023 02:40:42 +0200
+
 u-boot-asahi (2023.04-2-1) unstable; urgency=medium
 
   * Initial packaging (Closes: #1042471)
