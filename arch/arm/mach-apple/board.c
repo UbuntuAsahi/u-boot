@@ -675,7 +675,7 @@ static void efi_seed_boot_options(void)
 	size = efi_serialize_load_option(&lo, (u8 **)&p);
 	if (size == 0)
 		return;
-	optional_data = (char *)&lo + (size - u16_strsize(u"1234567"));
+	optional_data = (char *)p + (size - u16_strsize(u"1234567"));
 	memcpy(optional_data, &efi_guid_bootmenu_auto_generated,
 	       sizeof(efi_guid_t));
 
