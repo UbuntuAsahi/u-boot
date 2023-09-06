@@ -1,0 +1,17 @@
+From: Tobias Heider <me@tobhe.de>
+Date: Wed, 6 Sep 2023 12:41:30 +0200
+Subject: UBUNTU: disable u-boot logo
+
+---
+ configs/apple_m1_defconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/configs/apple_m1_defconfig b/configs/apple_m1_defconfig
+index 3fa3850..83653ee 100644
+--- a/configs/apple_m1_defconfig
++++ b/configs/apple_m1_defconfig
+@@ -28,3 +28,4 @@ CONFIG_LMB_MAX_REGIONS=64
+ # CONFIG_EFI_VARIABLE_FILE_STORE is not set
+ CONFIG_EFI_VARIABLE_NO_STORE=y
+ CONFIG_SYS_64BIT_LBA=y
++CONFIG_VIDEO_LOGO=n
