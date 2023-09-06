@@ -1,3 +1,9 @@
+u-boot-asahi (2023.07.02-2-1ubuntu1) jammy; urgency=medium
+
+  * Ubuntu upload
+
+ -- Tobias Heider <me@tobhe.de>  Tue, 29 Aug 2023 17:04:19 +0200
+
 u-boot-asahi (2023.07.02-2-1) unstable; urgency=medium
 
   * New upstream version 2023.07.02-2
