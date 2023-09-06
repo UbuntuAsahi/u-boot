@@ -1,3 +1,10 @@
+u-boot-asahi (2023.07.02-2-1ubuntu2) jammy; urgency=medium
+
+  * UBUNTU: disable boot logo
+  * UBUNTU: update gbp working branch
+
+ -- Tobias Heider <me@tobhe.de>  Wed, 06 Sep 2023 12:43:10 +0200
+
 u-boot-asahi (2023.07.02-2-1ubuntu1) jammy; urgency=medium
 
   * Ubuntu upload
