@@ -255,11 +255,6 @@
 
 	};
 
-	disp0_piodma: mapper@388000000 {
-		compatible = "apple,t6020-dcp-piodma", "apple,dcp-piodma";
-		iommus = <&disp0_dart 4>;
-	};
-
 	disp0_dart: iommu@389304000 {
 		compatible = "apple,t6020-dart", "apple,t8110-dart";
 		reg = <0x3 0x89304000 0x0 0x4000>;
@@ -313,8 +308,12 @@
 		resets = <&ps_disp0_cpu0>;
 		clocks = <&clk_disp0>;
 		apple,asc-dram-mask = <0 0>;
-		apple,piodma-mapper = <&disp0_piodma>;
 		phandle = <&dcp>;
+
+		disp0_piodma: piodma {
+			iommus = <&disp0_dart 4>;
+			phandle = <&disp0_piodma>;
+		};
 	};
 
 	display: display-subsystem {
@@ -563,14 +562,6 @@
 		#sound-dai-cells = <1>;
 	};
 
-	pmgr_gfx: power-management@404e80000 {
-		compatible = "apple,t6021-pmgr", "apple,pmgr", "syscon", "simple-mfd";
-		#address-cells = <1>;
-		#size-cells = <1>;
-
-		reg = <0x4 0x4e80000 0 0x4000>;
-	};
-
 	gpu: gpu@406400000 {
 		compatible = "apple,agx-g14x";
 		reg = <0x4 0x6400000 0 0x40000>,
@@ -600,12 +591,8 @@
 		apple,csafr-min-sram-microvolt = <812000>;
 		apple,perf-base-pstate = <1>;
 
-		apple,avg-power-filter-tc-ms = <300>;
-		apple,avg-power-ki-only = <1.5125>;
-		apple,avg-power-kp = <0.38>;
 		apple,avg-power-min-duty-cycle = <40>;
 		apple,avg-power-target-filter-tc = <1>;
-		apple,fast-die0-integral-gain = <700.0>;
 		apple,fast-die0-proportional-gain = <34.0>;
 		apple,perf-boost-ce-step = <50>;
 		apple,perf-boost-min-util = <90>;
@@ -827,5 +814,3 @@
 		power-domains = <&ps_apcie_gp_sys>;
 		status = "disabled";
 	};
-
-

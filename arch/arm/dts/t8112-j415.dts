@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0+ OR MIT
 /*
- * Apple MacBook Air (M2, 2022)
+ * Apple MacBook Air (15-inchl, M2, 2023)
  *
- * target-type: J413
+ * target-type: J415
  *
  * Copyright The Asahi Linux Contributors
  */
@@ -14,8 +14,8 @@
 #include <dt-bindings/leds/common.h>
 
 / {
-	compatible = "apple,j413", "apple,t8112", "apple,arm-platform";
-	model = "Apple MacBook Air (13-inch, M2, 2022)";
+	compatible = "apple,j415", "apple,t8112", "apple,arm-platform";
+	model = "Apple MacBook Air (15-inch, M2, 2023)";
 
 	aliases {
 		bluetooth0 = &bluetooth0;
@@ -38,11 +38,11 @@
 
 &dcp {
 	panel: panel {
-		compatible = "apple,panel-j413", "apple,panel";
-		width-mm = <290>;
-		height-mm = <189>;
-		adj-height-mm = <181>;
-		apple,max-brightness = <525>;
+		compatible = "apple,panel-j415", "apple,panel";
+		width-mm = <327>;
+		height-mm = <211>;
+		adj-height-mm = <204>;
+		apple,max-brightness = <500>;
 	};
 };
 
@@ -60,7 +60,7 @@
 		/* To be filled by the loader */
 		local-mac-address = [00 10 18 00 00 10];
 		apple,antenna-sku = "XX";
-		brcm,board-type = "apple,hokkaido";
+		brcm,board-type = "apple,snake";
 	};
 
 	bluetooth0: bluetooth@0,1 {
@@ -68,7 +68,7 @@
 		reg = <0x10100 0x0 0x0 0x0 0x0>;
 		/* To be filled by the loader */
 		local-bd-address = [00 00 00 00 00 00];
-		brcm,board-type = "apple,hokkaido";
+		brcm,board-type = "apple,snake";
 	};
 };
 
@@ -96,12 +96,12 @@
 };
 
 &i2c1 {
-	speaker_left_woof: codec@38 {
+	speaker_left_woof1: codec@38 {
 		compatible = "ti,sn012776", "ti,tas2764";
 		reg = <0x38>;
 		shutdown-gpios = <&pinctrl_ap 88 GPIO_ACTIVE_HIGH>;
 		#sound-dai-cells = <0>;
-		sound-name-prefix = "Left Woofer";
+		sound-name-prefix = "Left Woofer 1";
 	};
 
 	speaker_left_tweet: codec@39 {
@@ -111,15 +111,23 @@
 		#sound-dai-cells = <0>;
 		sound-name-prefix = "Left Tweeter";
 	};
+
+	speaker_left_woof2: codec@3a {
+		compatible = "ti,sn012776", "ti,tas2764";
+		reg = <0x3a>;
+		shutdown-gpios = <&pinctrl_ap 88 GPIO_ACTIVE_HIGH>;
+		#sound-dai-cells = <0>;
+		sound-name-prefix = "Left Woofer 2";
+	};
 };
 
 &i2c3 {
-	speaker_right_woof: codec@3b {
+	speaker_right_woof1: codec@3b {
 		compatible = "ti,sn012776", "ti,tas2764";
 		reg = <0x3b>;
 		shutdown-gpios = <&pinctrl_ap 88 GPIO_ACTIVE_HIGH>;
 		#sound-dai-cells = <0>;
-		sound-name-prefix = "Right Woofer";
+		sound-name-prefix = "Right Woofer 1";
 	};
 
 	speaker_right_tweet: codec@3c {
@@ -128,6 +136,14 @@
 		shutdown-gpios = <&pinctrl_ap 88 GPIO_ACTIVE_HIGH>;
 		#sound-dai-cells = <0>;
 		sound-name-prefix = "Right Tweeter";
+	};
+
+	speaker_right_woof2: codec@3d {
+		compatible = "ti,sn012776", "ti,tas2764";
+		reg = <0x3d>;
+		shutdown-gpios = <&pinctrl_ap 88 GPIO_ACTIVE_HIGH>;
+		#sound-dai-cells = <0>;
+		sound-name-prefix = "Right Woofer 2";
 	};
 
 	jack_codec: codec@4b {
@@ -140,18 +156,14 @@
 	};
 };
 
-&i2c4 {
-	status = "okay";
-};
-
 &fpwm1 {
 	status = "okay";
 };
 
 / {
 	sound {
-		compatible = "apple,j413-macaudio", "apple,macaudio";
-		model = "MacBook Air J413";
+		compatible = "apple,j415-macaudio", "apple,macaudio";
+		model = "MacBook Air J415";
 
 		dai-link@0 {
 			link-name = "Speakers";
@@ -169,8 +181,12 @@
 				sound-dai = <&mca 0>, <&mca 1>;
 			};
 			codec {
-				sound-dai = <&speaker_left_tweet>, <&speaker_left_woof>,
-					    <&speaker_right_tweet>, <&speaker_right_woof>;
+				sound-dai = <&speaker_left_woof1>,
+					    <&speaker_left_tweet>,
+					    <&speaker_left_woof2>,
+					    <&speaker_right_woof1>,
+					    <&speaker_right_tweet>,
+					    <&speaker_right_woof2>;
 			};
 		};
 
@@ -204,7 +220,7 @@
 	apple,stm-reset-gpios = <&smc_gpio 24 GPIO_ACTIVE_LOW>;
 
 	multi-touch {
-		firmware-name = "apple/tpmtfw-j413.bin";
+		firmware-name = "apple/tpmtfw-j415.bin";
 	};
 
 	keyboard: keyboard {

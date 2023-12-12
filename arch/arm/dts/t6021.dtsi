@@ -2,7 +2,7 @@
 /*
  * Apple T6021 "M2 Max" SoC
  *
- * Other names: H14J, "Jade"
+ * Other names: H14J, "Rhodes"
  *
  * Copyright The Asahi Linux Contributors
  */
@@ -27,24 +27,6 @@
 
 / {
 	compatible = "apple,t6001", "apple,arm-platform";
-
-	reserved-memory {
-		#address-cells = <2>;
-		#size-cells = <2>;
-		ranges;
-
-		uat_handoff: uat-handoff {
-			reg = <0 0 0 0>;
-		};
-
-		uat_pagetables: uat-pagetables {
-			reg = <0 0 0 0>;
-		};
-
-		uat_ttbs: uat-ttbs {
-			reg = <0 0 0 0>;
-		};
-	};
 
 	soc {
 		compatible = "simple-bus";
@@ -93,4 +75,11 @@
 
 &gpu {
 	compatible = "apple,agx-t6021", "apple,agx-g14x";
+
+	apple,avg-power-filter-tc-ms = <300>;
+	apple,avg-power-ki-only = <1.5125>;
+	apple,avg-power-kp = <0.38>;
+	apple,fast-die0-integral-gain = <700.0>;
+	apple,ppm-filter-time-constant-ms = <34>;
+	apple,ppm-ki = <18.0>;
 };

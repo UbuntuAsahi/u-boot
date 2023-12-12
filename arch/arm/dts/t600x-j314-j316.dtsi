@@ -36,7 +36,6 @@
 			compatible = "apple,simple-framebuffer", "simple-framebuffer";
 			reg = <0 0 0 0>; /* To be filled by loader */
 			/* Format properties will be added by loader */
-			backlight = <&backlight>;
 			status = "disabled";
 			power-domains = <&ps_disp0_cpu0>;
 		};
@@ -420,12 +419,6 @@
 };
 
 / {
-	backlight: gpio-bl {
-		compatible = "gpio-backlight";
-		gpios = <&smc_gpio 19 GPIO_ACTIVE_HIGH>;
-		default-on;
-	};
-
 	sound: sound {
 		compatible = "apple,j314-macaudio", "apple,macaudio";
 
