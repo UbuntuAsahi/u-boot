@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0+
 #
 # Copyright (c) 2013 Google, Inc
-# Copyright 2023 Arm Limited and/or its affiliates <open-source-office@arm.com>
+# Copyright 2022-2023 Arm Limited and/or its affiliates <open-source-office@arm.com>
 
 obj-$(CONFIG_UT_DM) += test-dm.o
 
@@ -73,6 +73,7 @@ obj-$(CONFIG_CMD_MUX) += mux-cmd.o
 obj-$(CONFIG_MULTIPLEXER) += mux-emul.o
 obj-$(CONFIG_MUX_MMIO) += mux-mmio.o
 obj-y += fdtdec.o
+obj-$(CONFIG_MTD_RAW_NAND) += nand.o
 obj-$(CONFIG_UT_DM) += nop.o
 obj-y += ofnode.o
 obj-y += ofread.o
@@ -92,6 +93,7 @@ obj-$(CONFIG_POWER_DOMAIN) += power-domain.o
 obj-$(CONFIG_ACPI_PMC) += pmc.o
 obj-$(CONFIG_DM_PMIC) += pmic.o
 obj-$(CONFIG_DM_PWM) += pwm.o
+obj-$(CONFIG_ARM_FFA_TRANSPORT) += ffa.o
 obj-$(CONFIG_QFW) += qfw.o
 obj-$(CONFIG_RAM) += ram.o
 obj-y += regmap.o
@@ -99,6 +101,7 @@ obj-$(CONFIG_REMOTEPROC) += remoteproc.o
 obj-$(CONFIG_DM_RESET) += reset.o
 obj-$(CONFIG_SYSRESET) += sysreset.o
 obj-$(CONFIG_DM_REGULATOR) += regulator.o
+obj-$(CONFIG_CMD_RKMTD) += rkmtd.o
 obj-$(CONFIG_DM_RNG) += rng.o
 obj-$(CONFIG_DM_RTC) += rtc.o
 obj-$(CONFIG_SCMI_FIRMWARE) += scmi.o
@@ -114,6 +117,7 @@ obj-$(CONFIG_DM_SPI) += spi.o
 obj-$(CONFIG_SPMI) += spmi.o
 obj-y += syscon.o
 obj-$(CONFIG_RESET_SYSCON) += syscon-reset.o
+obj-$(CONFIG_SM) += sm.o
 obj-$(CONFIG_SYSINFO) += sysinfo.o
 obj-$(CONFIG_SYSINFO_GPIO) += sysinfo-gpio.o
 obj-$(CONFIG_UT_DM) += tag.o

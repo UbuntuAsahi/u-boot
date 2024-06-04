@@ -17,9 +17,22 @@
 #define NO_SPI_TRACKPAD
 #include "t600x-j314-j316.dtsi"
 
-&nvram {
-	/* nvram is larger than on previous machines */
-	reg = <0x700000 0x100000>;
+/ {
+	aliases {
+		keyboard = &keyboard;
+	};
+};
+
+/* HACK: keep dptx_phy_ps power-domain always-on
+ *       it is unclear how to sequence with dcp for the integrated display
+ */
+&ps_dptx_phy_ps {
+	apple,always-on;
+};
+
+&dcpext0 {
+	/*  HDMI HPD gpio, used as interrupt*/
+	hdmi-hpd-gpios = <&pinctrl_aop 25 GPIO_ACTIVE_HIGH>;
 };
 
 &hpm0 {
@@ -38,33 +51,32 @@
 	interrupts = <44 IRQ_TYPE_LEVEL_LOW>;
 };
 
+/* Redefine GPIO for SDZ */
+&speaker_sdz {
+	gpios = <&pinctrl_ap 57 GPIO_ACTIVE_HIGH>;
+};
+
 &speaker_left_tweet {
-	shutdown-gpios = <&pinctrl_ap 57 GPIO_ACTIVE_HIGH>;
 	interrupts-extended = <&pinctrl_ap 58 IRQ_TYPE_LEVEL_LOW>;
 };
 
 &speaker_left_woof1 {
-	shutdown-gpios = <&pinctrl_ap 57 GPIO_ACTIVE_HIGH>;
 	interrupts-extended = <&pinctrl_ap 58 IRQ_TYPE_LEVEL_LOW>;
 };
 
 &speaker_left_woof2 {
-	shutdown-gpios = <&pinctrl_ap 57 GPIO_ACTIVE_HIGH>;
 	interrupts-extended = <&pinctrl_ap 58 IRQ_TYPE_LEVEL_LOW>;
 };
 
 &speaker_right_tweet {
-	shutdown-gpios = <&pinctrl_ap 57 GPIO_ACTIVE_HIGH>;
 	interrupts-extended = <&pinctrl_ap 58 IRQ_TYPE_LEVEL_LOW>;
 };
 
 &speaker_right_woof1 {
-	shutdown-gpios = <&pinctrl_ap 57 GPIO_ACTIVE_HIGH>;
 	interrupts-extended = <&pinctrl_ap 58 IRQ_TYPE_LEVEL_LOW>;
 };
 
 &speaker_right_woof2 {
-	shutdown-gpios = <&pinctrl_ap 57 GPIO_ACTIVE_HIGH>;
 	interrupts-extended = <&pinctrl_ap 58 IRQ_TYPE_LEVEL_LOW>;
 };
 
@@ -85,37 +97,7 @@
 	pwren-gpios = <&smc_gpio 22 GPIO_ACTIVE_HIGH>;
 };
 
-/* enable ISP power-domains */
-
-&ps_isp_sys {
-	status = "okay";
-};
-
-&ps_isp_cpu {
-	status = "okay";
-};
-
-&ps_isp_fe {
-	status = "okay";
-};
-
-&ps_dprx {
-	status = "okay";
-};
-
-&ps_isp_vis {
-	status = "okay";
-};
-
-&ps_isp_be {
-	status = "okay";
-};
-
-&ps_isp_raw {
-	status = "okay";
-};
-
-&ps_isp_clr {
+&ps_mtp_fabric {
 	status = "okay";
 };
 
@@ -156,3 +138,10 @@
 	tp_accel {
 	};
 };
+
+&isp {
+	apple,platform-id = <7>;
+	/delete-node/ sensor-presets; /* Override j31[46] below */
+};
+
+#include "isp-imx558-cfg0.dtsi"

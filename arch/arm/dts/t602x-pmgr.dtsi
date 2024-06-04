@@ -434,7 +434,8 @@
 		#power-domain-cells = <0>;
 		#reset-cells = <0>;
 		label = DIE_LABEL(dispext1_cpu0);
-		power-domains = <&DIE_NODE(ps_dispext1_sys)>;
+		power-domains = <&DIE_NODE(ps_dispext1_fe)>;
+		apple,min-state = <4>;
 	};
 
 	DIE_NODE(ps_dispext0_fe): power-controller@2c0 {
@@ -471,7 +472,8 @@
 		#power-domain-cells = <0>;
 		#reset-cells = <0>;
 		label = DIE_LABEL(dispext0_cpu0);
-		power-domains = <&DIE_NODE(ps_dispext0_sys)>;
+		power-domains = <&DIE_NODE(ps_dispext0_fe)>;
+		apple,min-state = <4>;
 	};
 
 	DIE_NODE(ps_ane_cpu): power-controller@2e0 {
@@ -900,6 +902,7 @@
 		#reset-cells = <0>;
 		label = DIE_LABEL(dispext2_cpu0);
 		power-domains = <&DIE_NODE(ps_dispext2_fe)>;
+		apple,min-state = <4>;
 	};
 
 	DIE_NODE(ps_msr1_ase_core): power-controller@1f0 {
@@ -943,6 +946,7 @@
 		#reset-cells = <0>;
 		label = DIE_LABEL(dispext3_cpu0);
 		power-domains = <&DIE_NODE(ps_dispext3_fe)>;
+		apple,min-state = <4>;
 	};
 
 	DIE_NODE(ps_venc1_dma): power-controller@4000 {
@@ -1230,7 +1234,7 @@
 		#reset-cells = <0>;
 		label = DIE_LABEL(isp_sys);
 		power-domains = <&DIE_NODE(ps_afnc2_lw1)>;
-		status = "disabled"; /* appears to be fused-off on j474s */
+		status = "disabled";
 	};
 
 	DIE_NODE(ps_disp0_fe): power-controller@1d0 {
@@ -1448,7 +1452,6 @@
 		#power-domain-cells = <0>;
 		#reset-cells = <0>;
 		label = DIE_LABEL(dptx_phy_ps);
-		apple,always-on;
 		power-domains = <&DIE_NODE(ps_sio)>;
 	};
 
@@ -1675,6 +1678,7 @@
 		#reset-cells = <0>;
 		label = DIE_LABEL(mca0);
 		power-domains = <&DIE_NODE(ps_audio_p)>, <&DIE_NODE(ps_sio_adma)>;
+		apple,externally-clocked;
 	};
 
 	DIE_NODE(ps_mca1): power-controller@3a0 {
@@ -1684,6 +1688,7 @@
 		#reset-cells = <0>;
 		label = DIE_LABEL(mca1);
 		power-domains = <&DIE_NODE(ps_audio_p)>, <&DIE_NODE(ps_sio_adma)>;
+		apple,externally-clocked;
 	};
 
 	DIE_NODE(ps_mca2): power-controller@3a8 {
@@ -1693,6 +1698,7 @@
 		#reset-cells = <0>;
 		label = DIE_LABEL(mca2);
 		power-domains = <&DIE_NODE(ps_audio_p)>, <&DIE_NODE(ps_sio_adma)>;
+		apple,externally-clocked;
 	};
 
 	DIE_NODE(ps_mca3): power-controller@3b0 {
@@ -1702,6 +1708,7 @@
 		#reset-cells = <0>;
 		label = DIE_LABEL(mca3);
 		power-domains = <&DIE_NODE(ps_audio_p)>, <&DIE_NODE(ps_sio_adma)>;
+		apple,externally-clocked;
 	};
 
 	DIE_NODE(ps_dpa0): power-controller@3b8 {
@@ -1838,14 +1845,22 @@
 		apple,always-on; /* Locked on */
 	};
 
+	/* There is a dependency tree involved with these PDs,
+	 * but we do not express it here since the ISP driver
+	 * is supposed to sequence them in the right order anyway.
+	 *
+	 * This also works around spurious parent PD activation
+	 * on machines with ISP disabled (desktops), so we don't
+	 * have to enable/disable everything in the per-model DTs.
+	 */
 	DIE_NODE(ps_isp_cpu): power-controller@4000 {
 		compatible = "apple,t6020-pmgr-pwrstate", "apple,pmgr-pwrstate";
 		reg = <0x4000 4>;
 		#power-domain-cells = <0>;
 		#reset-cells = <0>;
 		label = DIE_LABEL(isp_cpu);
-		power-domains = <&DIE_NODE(ps_isp_sys)>;
-		status = "disabled";
+		/* power-domains = <&DIE_NODE(ps_isp_sys)>; */
+		apple,force-disable;
 	};
 
 	DIE_NODE(ps_isp_fe): power-controller@4008 {
@@ -1854,8 +1869,7 @@
 		#power-domain-cells = <0>;
 		#reset-cells = <0>;
 		label = DIE_LABEL(isp_fe);
-		power-domains = <&DIE_NODE(ps_isp_sys)>;
-		status = "disabled";
+		/* power-domains = <&DIE_NODE(ps_isp_sys)>; */
 	};
 
 	DIE_NODE(ps_dprx): power-controller@4010 {
@@ -1864,8 +1878,7 @@
 		#power-domain-cells = <0>;
 		#reset-cells = <0>;
 		label = DIE_LABEL(dprx);
-		power-domains = <&DIE_NODE(ps_isp_sys)>;
-		status = "disabled";
+		/* power-domains = <&DIE_NODE(ps_isp_sys)>; */
 	};
 
 	DIE_NODE(ps_isp_vis): power-controller@4018 {
@@ -1874,8 +1887,7 @@
 		#power-domain-cells = <0>;
 		#reset-cells = <0>;
 		label = DIE_LABEL(isp_vis);
-		power-domains = <&DIE_NODE(ps_isp_fe)>;
-		status = "disabled";
+		/* power-domains = <&DIE_NODE(ps_isp_fe)>; */
 	};
 
 	DIE_NODE(ps_isp_be): power-controller@4020 {
@@ -1884,8 +1896,7 @@
 		#power-domain-cells = <0>;
 		#reset-cells = <0>;
 		label = DIE_LABEL(isp_be);
-		power-domains = <&DIE_NODE(ps_isp_fe)>;
-		status = "disabled";
+		/* power-domains = <&DIE_NODE(ps_isp_fe)>; */
 	};
 
 	DIE_NODE(ps_isp_raw): power-controller@4028 {
@@ -1894,8 +1905,7 @@
 		#power-domain-cells = <0>;
 		#reset-cells = <0>;
 		label = DIE_LABEL(isp_raw);
-		power-domains = <&DIE_NODE(ps_isp_fe)>;
-		status = "disabled";
+		/* power-domains = <&DIE_NODE(ps_isp_fe)>; */
 	};
 
 	DIE_NODE(ps_isp_clr): power-controller@4030 {
@@ -1904,8 +1914,7 @@
 		#power-domain-cells = <0>;
 		#reset-cells = <0>;
 		label = DIE_LABEL(isp_clr);
-		power-domains = <&DIE_NODE(ps_isp_be)>;
-		status = "disabled";
+		/* power-domains = <&DIE_NODE(ps_isp_be)>; */
 	};
 
 	DIE_NODE(ps_venc_dma): power-controller@8000 {
@@ -2071,6 +2080,7 @@
 		label = DIE_LABEL(mtp_fabric);
 		apple,always-on;
 		power-domains = <&DIE_NODE(ps_nub_fabric)>;
+		status = "disabled";
 	};
 
 	DIE_NODE(ps_nub_sram): power-controller@b8 {

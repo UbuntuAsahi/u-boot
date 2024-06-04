@@ -52,6 +52,7 @@
 #include <asm/mach-imx/sys_proto.h>
 #endif
 #include <linux/delay.h>
+#include <linux/printk.h>
 
 #include "dwc_eth_qos.h"
 
@@ -745,6 +746,7 @@ static int eqos_start(struct udevice *dev)
 	u32 val, tx_fifo_sz, rx_fifo_sz, tqs, rqs, pbl;
 	ulong last_rx_desc;
 	ulong desc_pad;
+	ulong addr64;
 
 	debug("%s(dev=%p):\n", __func__, dev);
 
@@ -811,6 +813,7 @@ static int eqos_start(struct udevice *dev)
 
 		if (!eqos->phy) {
 			pr_err("phy_connect() failed");
+			ret = -ENODEV;
 			goto err_stop_resets;
 		}
 
@@ -838,6 +841,7 @@ static int eqos_start(struct udevice *dev)
 
 	if (!eqos->phy->link) {
 		pr_err("No link");
+		ret = -EAGAIN;
 		goto err_shutdown_phy;
 	}
 
@@ -1036,25 +1040,25 @@ static int eqos_start(struct udevice *dev)
 
 	for (i = 0; i < EQOS_DESCRIPTORS_RX; i++) {
 		struct eqos_desc *rx_desc = eqos_get_desc(eqos, i, true);
-		rx_desc->des0 = (u32)(ulong)(eqos->rx_dma_buf +
-					     (i * EQOS_MAX_PACKET_SIZE));
+
+		addr64 = (ulong)(eqos->rx_dma_buf + (i * EQOS_MAX_PACKET_SIZE));
+		rx_desc->des0 = lower_32_bits(addr64);
+		rx_desc->des1 = upper_32_bits(addr64);
 		rx_desc->des3 = EQOS_DESC3_OWN | EQOS_DESC3_BUF1V;
 		mb();
 		eqos->config->ops->eqos_flush_desc(rx_desc);
-		eqos->config->ops->eqos_inval_buffer(eqos->rx_dma_buf +
-						(i * EQOS_MAX_PACKET_SIZE),
-						EQOS_MAX_PACKET_SIZE);
+		eqos->config->ops->eqos_inval_buffer((void *)addr64, EQOS_MAX_PACKET_SIZE);
 	}
 
-	writel(0, &eqos->dma_regs->ch0_txdesc_list_haddress);
-	writel((ulong)eqos_get_desc(eqos, 0, false),
-		&eqos->dma_regs->ch0_txdesc_list_address);
+	addr64 = (ulong)eqos_get_desc(eqos, 0, false);
+	writel(upper_32_bits(addr64), &eqos->dma_regs->ch0_txdesc_list_haddress);
+	writel(lower_32_bits(addr64), &eqos->dma_regs->ch0_txdesc_list_address);
 	writel(EQOS_DESCRIPTORS_TX - 1,
 	       &eqos->dma_regs->ch0_txdesc_ring_length);
 
-	writel(0, &eqos->dma_regs->ch0_rxdesc_list_haddress);
-	writel((ulong)eqos_get_desc(eqos, 0, true),
-		&eqos->dma_regs->ch0_rxdesc_list_address);
+	addr64 = (ulong)eqos_get_desc(eqos, 0, true);
+	writel(upper_32_bits(addr64), &eqos->dma_regs->ch0_rxdesc_list_haddress);
+	writel(lower_32_bits(addr64), &eqos->dma_regs->ch0_rxdesc_list_address);
 	writel(EQOS_DESCRIPTORS_RX - 1,
 	       &eqos->dma_regs->ch0_rxdesc_ring_length);
 
@@ -1159,8 +1163,8 @@ static int eqos_send(struct udevice *dev, void *packet, int length)
 	eqos->tx_desc_idx++;
 	eqos->tx_desc_idx %= EQOS_DESCRIPTORS_TX;
 
-	tx_desc->des0 = (ulong)eqos->tx_dma_buf;
-	tx_desc->des1 = 0;
+	tx_desc->des0 = lower_32_bits((ulong)eqos->tx_dma_buf);
+	tx_desc->des1 = upper_32_bits((ulong)eqos->tx_dma_buf);
 	tx_desc->des2 = length;
 	/*
 	 * Make sure that if HW sees the _OWN write below, it will see all the
@@ -1191,14 +1195,12 @@ static int eqos_recv(struct udevice *dev, int flags, uchar **packetp)
 	struct eqos_desc *rx_desc;
 	int length;
 
-	debug("%s(dev=%p, flags=%x):\n", __func__, dev, flags);
-
 	rx_desc = eqos_get_desc(eqos, eqos->rx_desc_idx, true);
 	eqos->config->ops->eqos_inval_desc(rx_desc);
-	if (rx_desc->des3 & EQOS_DESC3_OWN) {
-		debug("%s: RX packet not available\n", __func__);
+	if (rx_desc->des3 & EQOS_DESC3_OWN)
 		return -EAGAIN;
-	}
+
+	debug("%s(dev=%p, flags=%x):\n", __func__, dev, flags);
 
 	*packetp = eqos->rx_dma_buf +
 		(eqos->rx_desc_idx * EQOS_MAX_PACKET_SIZE);
@@ -1233,14 +1235,17 @@ static int eqos_free_pkt(struct udevice *dev, uchar *packet, int length)
 		for (idx = eqos->rx_desc_idx - idx_mask;
 		     idx <= eqos->rx_desc_idx;
 		     idx++) {
+			ulong addr64;
+
 			rx_desc = eqos_get_desc(eqos, idx, true);
 			rx_desc->des0 = 0;
+			rx_desc->des1 = 0;
 			mb();
 			eqos->config->ops->eqos_flush_desc(rx_desc);
 			eqos->config->ops->eqos_inval_buffer(packet, length);
-			rx_desc->des0 = (u32)(ulong)(eqos->rx_dma_buf +
-					     (idx * EQOS_MAX_PACKET_SIZE));
-			rx_desc->des1 = 0;
+			addr64 = (ulong)(eqos->rx_dma_buf + (idx * EQOS_MAX_PACKET_SIZE));
+			rx_desc->des0 = lower_32_bits(addr64);
+			rx_desc->des1 = upper_32_bits(addr64);
 			rx_desc->des2 = 0;
 			/*
 			 * Make sure that if HW sees the _OWN write below,
@@ -1314,22 +1319,12 @@ static int eqos_probe_resources_core(struct udevice *dev)
 	}
 	debug("%s: rx_dma_buf=%p\n", __func__, eqos->rx_dma_buf);
 
-	eqos->rx_pkt = malloc(EQOS_MAX_PACKET_SIZE);
-	if (!eqos->rx_pkt) {
-		debug("%s: malloc(rx_pkt) failed\n", __func__);
-		ret = -ENOMEM;
-		goto err_free_rx_dma_buf;
-	}
-	debug("%s: rx_pkt=%p\n", __func__, eqos->rx_pkt);
-
 	eqos->config->ops->eqos_inval_buffer(eqos->rx_dma_buf,
 			EQOS_MAX_PACKET_SIZE * EQOS_DESCRIPTORS_RX);
 
 	debug("%s: OK\n", __func__);
 	return 0;
 
-err_free_rx_dma_buf:
-	free(eqos->rx_dma_buf);
 err_free_tx_dma_buf:
 	free(eqos->tx_dma_buf);
 err_free_descs:
@@ -1348,7 +1343,6 @@ static int eqos_remove_resources_core(struct udevice *dev)
 
 	debug("%s(dev=%p):\n", __func__, dev);
 
-	free(eqos->rx_pkt);
 	free(eqos->rx_dma_buf);
 	free(eqos->tx_dma_buf);
 	eqos_free_descs(eqos->rx_descs);
@@ -1388,38 +1382,30 @@ static int eqos_probe_resources_tegra186(struct udevice *dev)
 	ret = clk_get_by_name(dev, "master_bus", &eqos->clk_master_bus);
 	if (ret) {
 		pr_err("clk_get_by_name(master_bus) failed: %d", ret);
-		goto err_free_clk_slave_bus;
+		goto err_free_gpio_phy_reset;
 	}
 
 	ret = clk_get_by_name(dev, "rx", &eqos->clk_rx);
 	if (ret) {
 		pr_err("clk_get_by_name(rx) failed: %d", ret);
-		goto err_free_clk_master_bus;
+		goto err_free_gpio_phy_reset;
 	}
 
 	ret = clk_get_by_name(dev, "ptp_ref", &eqos->clk_ptp_ref);
 	if (ret) {
 		pr_err("clk_get_by_name(ptp_ref) failed: %d", ret);
-		goto err_free_clk_rx;
+		goto err_free_gpio_phy_reset;
 	}
 
 	ret = clk_get_by_name(dev, "tx", &eqos->clk_tx);
 	if (ret) {
 		pr_err("clk_get_by_name(tx) failed: %d", ret);
-		goto err_free_clk_ptp_ref;
+		goto err_free_gpio_phy_reset;
 	}
 
 	debug("%s: OK\n", __func__);
 	return 0;
 
-err_free_clk_ptp_ref:
-	clk_free(&eqos->clk_ptp_ref);
-err_free_clk_rx:
-	clk_free(&eqos->clk_rx);
-err_free_clk_master_bus:
-	clk_free(&eqos->clk_master_bus);
-err_free_clk_slave_bus:
-	clk_free(&eqos->clk_slave_bus);
 err_free_gpio_phy_reset:
 	dm_gpio_free(dev, &eqos->phy_reset_gpio);
 err_free_reset_eqos:
@@ -1457,13 +1443,13 @@ static int eqos_probe_resources_stm32(struct udevice *dev)
 	ret = clk_get_by_name(dev, "mac-clk-rx", &eqos->clk_rx);
 	if (ret) {
 		pr_err("clk_get_by_name(rx) failed: %d", ret);
-		goto err_free_clk_master_bus;
+		goto err_probe;
 	}
 
 	ret = clk_get_by_name(dev, "mac-clk-tx", &eqos->clk_tx);
 	if (ret) {
 		pr_err("clk_get_by_name(tx) failed: %d", ret);
-		goto err_free_clk_rx;
+		goto err_probe;
 	}
 
 	/*  Get ETH_CLK clocks (optional) */
@@ -1474,10 +1460,6 @@ static int eqos_probe_resources_stm32(struct udevice *dev)
 	debug("%s: OK\n", __func__);
 	return 0;
 
-err_free_clk_rx:
-	clk_free(&eqos->clk_rx);
-err_free_clk_master_bus:
-	clk_free(&eqos->clk_master_bus);
 err_probe:
 
 	debug("%s: returns %d\n", __func__, ret);
@@ -1495,13 +1477,6 @@ static int eqos_remove_resources_tegra186(struct udevice *dev)
 
 	debug("%s(dev=%p):\n", __func__, dev);
 
-#ifdef CONFIG_CLK
-	clk_free(&eqos->clk_tx);
-	clk_free(&eqos->clk_ptp_ref);
-	clk_free(&eqos->clk_rx);
-	clk_free(&eqos->clk_slave_bus);
-	clk_free(&eqos->clk_master_bus);
-#endif
 	dm_gpio_free(dev, &eqos->phy_reset_gpio);
 	reset_free(&eqos->reset_ctl);
 
@@ -1511,19 +1486,7 @@ static int eqos_remove_resources_tegra186(struct udevice *dev)
 
 static int eqos_remove_resources_stm32(struct udevice *dev)
 {
-	struct eqos_priv * __maybe_unused eqos = dev_get_priv(dev);
-
 	debug("%s(dev=%p):\n", __func__, dev);
-
-#ifdef CONFIG_CLK
-	clk_free(&eqos->clk_tx);
-	clk_free(&eqos->clk_rx);
-	clk_free(&eqos->clk_master_bus);
-	if (clk_valid(&eqos->clk_ck))
-		clk_free(&eqos->clk_ck);
-#endif
-
-	debug("%s: OK\n", __func__);
 	return 0;
 }
 
@@ -1717,15 +1680,33 @@ static const struct udevice_id eqos_ids[] = {
 		.compatible = "nxp,imx8mp-dwmac-eqos",
 		.data = (ulong)&eqos_imx_config
 	},
+	{
+		.compatible = "nxp,imx93-dwmac-eqos",
+		.data = (ulong)&eqos_imx_config
+	},
 #endif
-
+#if IS_ENABLED(CONFIG_DWC_ETH_QOS_ROCKCHIP)
+	{
+		.compatible = "rockchip,rk3568-gmac",
+		.data = (ulong)&eqos_rockchip_config
+	},
+	{
+		.compatible = "rockchip,rk3588-gmac",
+		.data = (ulong)&eqos_rockchip_config
+	},
+#endif
 #if IS_ENABLED(CONFIG_DWC_ETH_QOS_QCOM)
 	{
 		.compatible = "qcom,qcs404-ethqos",
 		.data = (ulong)&eqos_qcom_config
 	},
 #endif
-
+#if IS_ENABLED(CONFIG_DWC_ETH_QOS_STARFIVE)
+	{
+		.compatible = "starfive,jh7110-dwmac",
+		.data = (ulong)&eqos_jh7110_config
+	},
+#endif
 	{ }
 };
 

@@ -10,6 +10,7 @@
 /dts-v1/;
 
 #include "t6022.dtsi"
+#include "t6022-jxxxd.dtsi"
 
 / {
 	compatible = "apple,j180d", "apple,t6022", "apple,arm-platform";
@@ -24,11 +25,9 @@
 		atcphy6 = &atcphy2_die1;
 		atcphy7 = &atcphy3_die1;
 		//bluetooth0 = &bluetooth0;
-		dcp = &dcp;
-		disp0 = &display;
-		disp0_piodma = &disp0_piodma;
 		//ethernet0 = &ethernet0;
 		//ethernet1 = &ethernet1;
+		nvram = &nvram;
 		serial0 = &serial0;
 		//wifi0 = &wifi0;
 	};
@@ -45,7 +44,7 @@
 			reg = <0 0 0 0>; /* To be filled by loader */
 			/* Format properties will be added by loader */
 			status = "disabled";
-			power-domains = <&ps_disp0_cpu0>;
+			power-domains = <&ps_dispext0_cpu0_die1>, <&ps_dptx_phy_ps_die1>;
 		};
 	};
 
@@ -64,10 +63,6 @@
 
 &serial0 {
 	status = "okay";
-};
-
-&dcp {
-	apple,connector-type = "HDMI-A";
 };
 
 /* USB Type C Rear */
@@ -136,69 +131,9 @@
 		};
 	};
 
-	hpm4: usb-pd@39 {
-		compatible = "apple,cd321x";
-		reg = <0x39>;
-		interrupt-parent = <&pinctrl_ap>;
-		interrupts = <44 IRQ_TYPE_LEVEL_LOW>;
-		interrupt-names = "irq";
+	/* hpm4 included from t6022-jxxxd.dtsi */
 
-		typec4: connector {
-			compatible = "usb-c-connector";
-			label = "USB-C Back 3";
-			power-role = "dual";
-			data-role = "dual";
-
-			ports {
-				#address-cells = <1>;
-				#size-cells = <0>;
-				port@0 {
-					reg = <0>;
-					typec4_con_hs: endpoint {
-						remote-endpoint = <&typec4_usb_hs>;
-					};
-				};
-				port@1 {
-					reg = <1>;
-					typec4_con_ss: endpoint {
-						remote-endpoint = <&typec4_usb_ss>;
-					};
-				};
-			};
-		};
-	};
-
-	hpm5: usb-pd@3a {
-		compatible = "apple,cd321x";
-		reg = <0x3a>;
-		interrupt-parent = <&pinctrl_ap>;
-		interrupts = <44 IRQ_TYPE_LEVEL_LOW>;
-		interrupt-names = "irq";
-
-		typec5: connector {
-			compatible = "usb-c-connector";
-			label = "USB-C Back 4";
-			power-role = "dual";
-			data-role = "dual";
-
-			ports {
-				#address-cells = <1>;
-				#size-cells = <0>;
-				port@0 {
-					reg = <0>;
-					typec5_con_hs: endpoint {
-						remote-endpoint = <&typec5_usb_hs>;
-					};
-				};
-				port@1 {
-					reg = <1>;
-					typec5_con_ss: endpoint {
-						remote-endpoint = <&typec5_usb_ss>;
-					};
-				};
-			};
-		};
-	};
+	/* hpm5 included from t6022-jxxxd.dtsi */
 
 	hpm6: usb-pd@3d {
 		compatible = "apple,cd321x";
@@ -263,6 +198,14 @@
 			};
 		};
 	};
+};
+
+&hpm4 {
+	label = "USB-C Back 3";
+};
+
+&hpm5 {
+	label = "USB-C Back 4";
 };
 
 /* USB Type C Front */
@@ -367,22 +310,6 @@
 	};
 };
 
-&dwc3_0_die1 {
-	port {
-		typec4_usb_hs: endpoint {
-			remote-endpoint = <&typec4_con_hs>;
-		};
-	};
-};
-
-&dwc3_1_die1 {
-	port {
-		typec5_usb_hs: endpoint {
-			remote-endpoint = <&typec5_con_hs>;
-		};
-	};
-};
-
 &dwc3_2_die1 {
 	port {
 		typec6_usb_hs: endpoint {
@@ -432,22 +359,6 @@
 	};
 };
 
-&atcphy0_die1 {
-	port {
-		typec4_usb_ss: endpoint {
-			remote-endpoint = <&typec4_con_ss>;
-		};
-	};
-};
-
-&atcphy1_die1 {
-	port {
-		typec5_usb_ss: endpoint {
-			remote-endpoint = <&typec5_con_ss>;
-		};
-	};
-};
-
 &atcphy2_die1 {
 	port {
 		typec6_usb_ss: endpoint {
@@ -474,6 +385,9 @@
 		shutdown-gpios = <&pinctrl_ap 57 GPIO_ACTIVE_HIGH>;
 		#sound-dai-cells = <0>;
 		sound-name-prefix = "Tweeter";
+		interrupts-extended = <&pinctrl_ap 58 IRQ_TYPE_LEVEL_LOW>;
+		ti,imon-slot-no = <4>;
+		ti,vmon-slot-no = <6>;
 	};
 
 	speaker_woofer: codec@39 {
@@ -482,6 +396,9 @@
 		shutdown-gpios = <&pinctrl_ap 57 GPIO_ACTIVE_HIGH>;
 		#sound-dai-cells = <0>;
 		sound-name-prefix = "Woofer";
+		interrupts-extended = <&pinctrl_ap 58 IRQ_TYPE_LEVEL_LOW>;
+		ti,imon-slot-no = <0>;
+		ti,vmon-slot-no = <2>;
 	};
 };
 
@@ -521,7 +438,7 @@
 				sound-dai = <&mca 0>;
 			};
 			codec {
-				sound-dai = <&speaker_tweeter>, <&speaker_woofer>;
+				sound-dai = <&speaker_woofer>, <&speaker_tweeter>;
 			};
 		};
 
@@ -562,10 +479,6 @@
 	status = "ok";
 };
 
-/* delete unused always-on power-domains on die 1 */
-/delete-node/ &ps_disp0_cpu0_die1;
-/delete-node/ &ps_disp0_fe_die1;
-
 &gpu {
 	apple,idleoff-standby-timer = <3000>;
 	apple,perf-base-pstate = <5>;
@@ -573,3 +486,5 @@
 	apple,perf-boost-min-util = <75>;
 	apple,perf-tgt-utilization = <70>;
 };
+
+#include "spi1-nvram.dtsi"

@@ -20,6 +20,7 @@
 
 #include <asm/cache.h>
 #include <asm/mmu.h>
+#include <asm/fsl_lbc.h>
 #include <asm/u-boot.h>
 
 #include "hrcw/hrcw.h"
@@ -244,7 +245,7 @@ in_flash:
 	cmplw	r3, r4
 	bne	1b
 
-#if CONFIG_VAL(SYS_MALLOC_F_LEN)
+#if CONFIG_IS_ENABLED(SYS_MALLOC_F)
 
 #if CONFIG_VAL(SYS_MALLOC_F_LEN) + GENERATED_GBL_DATA_SIZE > CFG_SYS_INIT_RAM_SIZE
 #error "SYS_MALLOC_F_LEN too large to fit into initial RAM."

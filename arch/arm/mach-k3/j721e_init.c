@@ -2,11 +2,10 @@
 /*
  * J721E: SoC specific initialization
  *
- * Copyright (C) 2018-2019 Texas Instruments Incorporated - http://www.ti.com/
+ * Copyright (C) 2018-2019 Texas Instruments Incorporated - https://www.ti.com/
  *	Lokesh Vutla <lokeshvutla@ti.com>
  */
 
-#include <common.h>
 #include <init.h>
 #include <spl.h>
 #include <asm/io.h>
@@ -229,6 +228,18 @@ void board_init_f(ulong dummy)
 		pinctrl_select_state(dev, "default");
 
 	/*
+	 * Force probe of clk_k3 driver here to ensure basic default clock
+	 * configuration is always done.
+	 */
+	if (IS_ENABLED(CONFIG_SPL_CLK_K3)) {
+		ret = uclass_get_device_by_driver(UCLASS_CLK,
+						  DM_DRIVER_GET(ti_clk),
+						  &dev);
+		if (ret)
+			panic("Failed to initialize clk-k3!\n");
+	}
+
+	/*
 	 * Load, start up, and configure system controller firmware. Provide
 	 * the U-Boot console init function to the SYSFW post-PM configuration
 	 * callback hook, effectively switching on (or over) the console
@@ -240,18 +251,6 @@ void board_init_f(ulong dummy)
 #ifdef CONFIG_SPL_OF_LIST
 	do_dt_magic();
 #endif
-
-	/*
-	 * Force probe of clk_k3 driver here to ensure basic default clock
-	 * configuration is always done.
-	 */
-	if (IS_ENABLED(CONFIG_SPL_CLK_K3)) {
-		ret = uclass_get_device_by_driver(UCLASS_CLK,
-						  DM_DRIVER_GET(ti_clk),
-						  &dev);
-		if (ret)
-			panic("Failed to initialize clk-k3!\n");
-	}
 
 	/* Prepare console output */
 	preloader_console_init();
@@ -287,13 +286,20 @@ void board_init_f(ulong dummy)
 	if (ret)
 		panic("DRAM init failed: %d\n", ret);
 #endif
-	spl_enable_dcache();
+	spl_enable_cache();
 }
 
 u32 spl_mmc_boot_mode(struct mmc *mmc, const u32 boot_device)
 {
 	switch (boot_device) {
 	case BOOT_DEVICE_MMC1:
+		if (IS_ENABLED(CONFIG_SUPPORT_EMMC_BOOT)) {
+			if (spl_mmc_emmc_boot_partition(mmc))
+				return MMCSD_MODE_EMMCBOOT;
+			return MMCSD_MODE_FS;
+		}
+		if (IS_ENABLED(CONFIG_SPL_FS_FAT) || IS_ENABLED(CONFIG_SPL_FS_EXT4))
+			return MMCSD_MODE_FS;
 		return MMCSD_MODE_EMMCBOOT;
 	case BOOT_DEVICE_MMC2:
 		return MMCSD_MODE_FS;

@@ -11,12 +11,13 @@
 #include <malloc.h>
 #include <asm/io.h>
 #include <bitfield.h>
+#include <clk.h>
 #include <dm.h>
 #include <errno.h>
 #include <generic-phy.h>
 #include <regmap.h>
 #include <linux/delay.h>
-#include <clk.h>
+#include <linux/printk.h>
 #include <linux/usb/otg.h>
 
 #include <asm/arch/usb-gx.h>
@@ -202,7 +203,6 @@ int meson_gxl_usb2_phy_probe(struct udevice *dev)
 	ret = clk_enable(&priv->clk);
 	if (ret && ret != -ENOSYS && ret != -ENOTSUPP) {
 		pr_err("failed to enable PHY clock\n");
-		clk_free(&priv->clk);
 		return ret;
 	}
 #endif

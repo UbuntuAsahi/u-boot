@@ -51,10 +51,6 @@ struct udevice;
 				 PHY_100BT_FEATURES | \
 				 PHY_DEFAULT_FEATURES)
 
-#define PHY_100BT1_FEATURES	(SUPPORTED_TP | \
-				 SUPPORTED_MII | \
-				 SUPPORTED_100baseT_Full)
-
 #define PHY_GBIT_FEATURES	(PHY_BASIC_FEATURES | \
 				 PHY_1000BT_FEATURES)
 
@@ -172,14 +168,6 @@ struct fixed_link {
 };
 
 /**
- * phy_init() - Initializes the PHY drivers
- * This function registers all available PHY drivers
- *
- * @return: 0 if OK, -ve on error
- */
-int phy_init(void);
-
-/**
  * phy_reset() - Resets the specified PHY
  * Issues a reset of the PHY and waits for it to complete
  *
@@ -222,15 +210,6 @@ static inline struct phy_device *fixed_phy_create(ofnode node)
 }
 
 #endif
-
-/**
- * phy_connect_dev() - Associates the given pair of PHY and Ethernet devices
- * @phydev:	PHY device
- * @dev:	Ethernet device
- * @interface:	type of MAC-PHY interface
- */
-void phy_connect_dev(struct phy_device *phydev, struct udevice *dev,
-		     phy_interface_t interface);
 
 /**
  * phy_connect() - Creates a PHY device for the Ethernet interface

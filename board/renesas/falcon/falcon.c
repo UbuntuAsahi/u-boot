@@ -6,8 +6,7 @@
  * Copyright (C) 2020 Renesas Electronics Corp.
  */
 
-#include <common.h>
-#include <asm/arch/rmobile.h>
+#include <asm/arch/renesas.h>
 #include <asm/arch/sys_proto.h>
 #include <asm/global_data.h>
 #include <asm/io.h>
@@ -15,6 +14,7 @@
 #include <asm/processor.h>
 #include <linux/errno.h>
 #include <asm/system.h>
+#include <asm/u-boot.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -84,8 +84,6 @@ int board_early_init_f(void)
 }
 
 #define RST_BASE	0xE6160000 /* Domain0 */
-#define RST_SRESCR0	(RST_BASE + 0x18)
-#define RST_SPRES	0x5AA58000
 #define RST_WDTRSTCR	(RST_BASE + 0x10)
 #define RST_RWDT	0xA55A8002
 
@@ -102,9 +100,4 @@ int board_init(void)
 	}
 
 	return 0;
-}
-
-void reset_cpu(void)
-{
-	writel(RST_SPRES, RST_SRESCR0);
 }

@@ -85,6 +85,12 @@ config DRAM_SUN50I_H616_TPR2
 	help
 	  TPR2 value from vendor DRAM settings.
 
+config DRAM_SUN50I_H616_TPR6
+	hex "H616 DRAM TPR6 parameter"
+	default 0x3300c080
+	help
+	  TPR6 value from vendor DRAM settings.
+
 config DRAM_SUN50I_H616_TPR10
 	hex "H616 DRAM TPR10 parameter"
 	help
@@ -121,7 +127,7 @@ config AXP_PMIC_BUS
 config SUNXI_SRAM_ADDRESS
 	hex
 	default 0x10000 if MACH_SUN9I || MACH_SUN50I || MACH_SUN50I_H5
-	default 0x20000 if SUN50I_GEN_H6
+	default 0x20000 if SUN50I_GEN_H6 || SUNXI_GEN_NCAT2
 	default 0x0
 	---help---
 	Older Allwinner SoCs have their mask boot ROM mapped just below 4GB,
@@ -155,6 +161,23 @@ config SUNXI_RVBAR_ALTERNATIVE
 	for all other SoCs, so the content of the SRAM_VER_REG becomes
 	irrelevant there, and we can use the same code.
 
+config SUNXI_BL31_BASE
+	hex
+	default 0x00044000 if MACH_SUN50I || MACH_SUN50I_H5
+	default 0x00104000 if MACH_SUN50I_H6
+	default 0x40000000 if MACH_SUN50I_H616
+	default 0x0
+	help
+	  Address where BL31 (TF-A) is loaded, or zero if BL31 is not used.
+
+config SUNXI_SCP_BASE
+	hex
+	default 0x00050000 if MACH_SUN50I || MACH_SUN50I_H5
+	default 0x00114000 if MACH_SUN50I_H6
+	default 0x0
+	help
+	  Address where SCP firmware is loaded, or zero if it is not used.
+
 config SUNXI_A64_TIMER_ERRATUM
 	bool
 
@@ -176,11 +199,19 @@ config SUNXI_GEN_SUN6I
 config SUN50I_GEN_H6
 	bool
 	select FIT
-	select SPL_LOAD_FIT
+	select SPL_LOAD_FIT if SPL
 	select MMC_SUNXI_HAS_NEW_MODE
 	select SUPPORT_SPL
 	---help---
 	Select this for sunxi SoCs which have H6 like peripherals, clocks
+	and memory map.
+
+config SUNXI_GEN_NCAT2
+	bool
+	select MMC_SUNXI_HAS_NEW_MODE
+	select SUPPORT_SPL
+	---help---
+	Select this for sunxi SoCs which have D1 like peripherals, clocks
 	and memory map.
 
 config SUNXI_DRAM_DW
@@ -207,7 +238,6 @@ endif
 
 config MACH_SUNXI_H3_H5
 	bool
-	select PHY_SUN4I_USB
 	select SUNXI_DE2
 	select SUNXI_DRAM_DW
 	select SUNXI_DRAM_DW_32BIT
@@ -236,7 +266,6 @@ config MACH_SUNIV
 config MACH_SUN4I
 	bool "sun4i (Allwinner A10)"
 	select CPU_V7A
-	select PHY_SUN4I_USB
 	select DRAM_SUN4I
 	select SUNXI_GEN_SUN4I
 	select SUPPORT_SPL
@@ -247,7 +276,6 @@ config MACH_SUN5I
 	bool "sun5i (Allwinner A13)"
 	select CPU_V7A
 	select DRAM_SUN4I
-	select PHY_SUN4I_USB
 	select SUNXI_GEN_SUN4I
 	select SUPPORT_SPL
 	imply SPL_SYS_I2C_LEGACY
@@ -261,8 +289,7 @@ config MACH_SUN6I
 	select ARCH_SUPPORT_PSCI
 	select SPL_ARMV7_SET_CORTEX_SMPEN
 	select DRAM_SUN6I
-	select PHY_SUN4I_USB
-	select SPL_I2C
+	select SPL_I2C if SPL
 	select SUN6I_PRCM
 	select SUNXI_GEN_SUN6I
 	select SUPPORT_SPL
@@ -277,7 +304,6 @@ config MACH_SUN7I
 	select ARCH_SUPPORT_PSCI
 	select SPL_ARMV7_SET_CORTEX_SMPEN
 	select DRAM_SUN4I
-	select PHY_SUN4I_USB
 	select SUNXI_GEN_SUN4I
 	select SUPPORT_SPL
 	select ARMV7_BOOT_SEC_DEFAULT if OLD_SUNXI_KERNEL_COMPAT
@@ -291,8 +317,7 @@ config MACH_SUN8I_A23
 	select CPU_V7_HAS_VIRT
 	select ARCH_SUPPORT_PSCI
 	select DRAM_SUN8I_A23
-	select PHY_SUN4I_USB
-	select SPL_I2C
+	select SPL_I2C if SPL
 	select SUNXI_GEN_SUN6I
 	select SUPPORT_SPL
 	select SYS_I2C_SUN8I_RSB
@@ -305,8 +330,7 @@ config MACH_SUN8I_A33
 	select CPU_V7_HAS_VIRT
 	select ARCH_SUPPORT_PSCI
 	select DRAM_SUN8I_A33
-	select PHY_SUN4I_USB
-	select SPL_I2C
+	select SPL_I2C if SPL
 	select SUNXI_GEN_SUN6I
 	select SUPPORT_SPL
 	select SYS_I2C_SUN8I_RSB
@@ -316,8 +340,7 @@ config MACH_SUN8I_A83T
 	bool "sun8i (Allwinner A83T)"
 	select CPU_V7A
 	select DRAM_SUN8I_A83T
-	select PHY_SUN4I_USB
-	select SPL_I2C
+	select SPL_I2C if SPL
 	select SUNXI_GEN_SUN6I
 	select MMC_SUNXI_HAS_NEW_MODE
 	select MMC_SUNXI_HAS_MODE_SWITCH
@@ -344,8 +367,20 @@ config MACH_SUN8I_R40
 	select SUPPORT_SPL
 	select SUNXI_DRAM_DW
 	select SUNXI_DRAM_DW_32BIT
-	select PHY_SUN4I_USB
 	imply SPL_SYS_I2C_LEGACY
+
+config MACH_SUN8I_R528
+	bool "sun8i (Allwinner R528)"
+	select CPU_V7A
+	select CPU_V7_HAS_NONSEC
+	select CPU_V7_HAS_VIRT
+	select ARCH_SUPPORT_PSCI
+	select SPL_ARMV7_SET_CORTEX_SMPEN
+	select SUNXI_GEN_NCAT2
+	select SUNXI_NEW_PINCTRL
+	select MMC_SUNXI_HAS_NEW_MODE
+	select SUPPORT_SPL
+	select DRAM_SUN20I_D1
 
 config MACH_SUN8I_V3S
 	bool "sun8i (Allwinner V3/V3s/S3/S3L)"
@@ -364,7 +399,7 @@ config MACH_SUN9I
 	select CPU_V7A
 	select SPL_ARMV7_SET_CORTEX_SMPEN
 	select DRAM_SUN9I
-	select SPL_I2C
+	select SPL_I2C if SPL
 	select SUN6I_PRCM
 	select SUNXI_GEN_SUN6I
 	select SUPPORT_SPL
@@ -372,7 +407,6 @@ config MACH_SUN9I
 config MACH_SUN50I
 	bool "sun50i (Allwinner A64)"
 	select ARM64
-	select PHY_SUN4I_USB
 	select SUN6I_PRCM
 	select SUNXI_DE2
 	select SUNXI_GEN_SUN6I
@@ -381,7 +415,7 @@ config MACH_SUN50I
 	select SUNXI_DRAM_DW
 	select SUNXI_DRAM_DW_32BIT
 	select FIT
-	select SPL_LOAD_FIT
+	select SPL_LOAD_FIT if SPL
 	select SUNXI_A64_TIMER_ERRATUM
 
 config MACH_SUN50I_H5
@@ -390,12 +424,11 @@ config MACH_SUN50I_H5
 	select MACH_SUNXI_H3_H5
 	select MMC_SUNXI_HAS_NEW_MODE
 	select FIT
-	select SPL_LOAD_FIT
+	select SPL_LOAD_FIT if SPL
 
 config MACH_SUN50I_H6
 	bool "sun50i (Allwinner H6)"
 	select ARM64
-	select PHY_SUN4I_USB
 	select DRAM_SUN50I_H6
 	select SUN50I_GEN_H6
 
@@ -442,7 +475,7 @@ config ARM_BOOT_HOOK_RMR
 	This allows both the SPL and the U-Boot proper to be entered in
 	either mode and switch to AArch64 if needed.
 
-if SUNXI_DRAM_DW || DRAM_SUN50I_H6
+if SUNXI_DRAM_DW || DRAM_SUN50I_H6 || DRAM_SUN50I_H616
 config SUNXI_DRAM_DDR3
 	bool
 
@@ -450,6 +483,9 @@ config SUNXI_DRAM_DDR2
 	bool
 
 config SUNXI_DRAM_LPDDR3
+	bool
+
+config SUNXI_DRAM_LPDDR4
 	bool
 
 choice
@@ -486,6 +522,30 @@ config SUNXI_DRAM_H6_DDR3_1333
 	---help---
 	This option is the DDR3 timing used by the boot0 on H6 TV boxes
 	which use a DDR3-1333 timing.
+
+config SUNXI_DRAM_H616_LPDDR3
+	bool "LPDDR3 DRAM chips on the H616 DRAM controller"
+	select SUNXI_DRAM_LPDDR3
+	depends on DRAM_SUN50I_H616
+	help
+	  This option is the LPDDR3 timing used by the stock boot0 by
+	  Allwinner.
+
+config SUNXI_DRAM_H616_LPDDR4
+	bool "LPDDR4 DRAM chips on the H616 DRAM controller"
+	select SUNXI_DRAM_LPDDR4
+	depends on DRAM_SUN50I_H616
+	help
+	  This option is the LPDDR4 timing used by the stock boot0 by
+	  Allwinner.
+
+config SUNXI_DRAM_H616_DDR3_1333
+	bool "DDR3-1333 boot0 timings on the H616 DRAM controller"
+	select SUNXI_DRAM_DDR3
+	depends on DRAM_SUN50I_H616
+	help
+	  This option is the DDR3 timing used by the boot0 on H616 TV boxes
+	  which use a DDR3-1333 timing.
 
 config SUNXI_DRAM_DDR2_V3S
 	bool "DDR2 found in V3s chip"
@@ -563,7 +623,7 @@ config DRAM_EMR1
 
 config DRAM_TPR3
 	hex "sunxi dram tpr3 value"
-	default 0
+	default 0x0
 	---help---
 	Set the dram controller tpr3 parameter. This parameter configures
 	the delay on the command lane and also phase shifts, which are
@@ -574,7 +634,7 @@ config DRAM_TPR3
 
 config DRAM_DQS_GATING_DELAY
 	hex "sunxi dram dqs_gating_delay value"
-	default 0
+	default 0x0
 	---help---
 	Set the dram controller dqs_gating_delay parmeter. Each byte
 	encodes the DQS gating delay for each byte lane. The delay
@@ -643,6 +703,7 @@ config SYS_CLK_FREQ
 	default 1008000000 if MACH_SUN9I
 	default 888000000 if MACH_SUN50I_H6
 	default 1008000000 if MACH_SUN50I_H616
+	default 1008000000 if MACH_SUN8I_R528
 
 config SYS_CONFIG_NAME
 	default "suniv" if MACH_SUNIV
@@ -651,6 +712,7 @@ config SYS_CONFIG_NAME
 	default "sun6i" if MACH_SUN6I
 	default "sun7i" if MACH_SUN7I
 	default "sun8i" if MACH_SUN8I
+	default "sun8i" if MACH_SUN8I_R528
 	default "sun9i" if MACH_SUN9I
 	default "sun50i" if MACH_SUN50I
 	default "sun50i" if MACH_SUN50I_H6
@@ -689,13 +751,6 @@ config OLD_SUNXI_KERNEL_COMPAT
 	---help---
 	Set this to enable various workarounds for old kernels, this results in
 	sub-optimal settings for newer kernels, only enable if needed.
-
-config MACPWR
-	string "MAC power pin"
-	default ""
-	help
-	  Set the pin used to power the MAC. This takes a string in the format
-	  understood by sunxi_name_to_gpio, e.g. PH1 for pin 1 of port H.
 
 config MMC1_PINS_PH
 	bool "Pins for mmc1 are on Port H"
@@ -790,7 +845,6 @@ config AXP_GPIO
 config AXP_DISABLE_BOOT_ON_POWERON
 	bool "Disable device boot on power plug-in"
 	depends on AXP209_POWER || AXP221_POWER || AXP809_POWER || AXP818_POWER
-	default n
 	---help---
 	  Say Y here to prevent the device from booting up because of a plug-in
 	  event. When set, the device will boot into the SPL briefly to
@@ -806,6 +860,7 @@ config VIDEO_SUNXI
 	depends on !MACH_SUN9I
 	depends on !MACH_SUN50I
 	depends on !SUN50I_GEN_H6
+	depends on !SUNXI_GEN_NCAT2
 	select VIDEO
 	select DISPLAY
 	imply VIDEO_DT_SIMPLEFB
@@ -1003,14 +1058,6 @@ config VIDEO_LCD_TL059WV5C0
 
 endchoice
 
-config SATAPWR
-	string "SATA power pin"
-	default ""
-	help
-	  Set the pins used to power the SATA. This takes a string in the
-	  format understood by sunxi_name_to_gpio, e.g. PH1 for pin 1 of
-	  port H.
-
 config GMAC_TX_DELAY
 	int "GMAC Transmit Clock Delay Chain"
 	default 0
@@ -1027,6 +1074,7 @@ config SPL_STACK_R_ADDR
 	default 0x2fe00000 if MACH_SUN9I
 	default 0x4fe00000 if MACH_SUN50I
 	default 0x4fe00000 if SUN50I_GEN_H6
+	default 0x4fe00000 if SUNXI_GEN_NCAT2
 
 config SPL_SPI_SUNXI
 	bool "Support for SPI Flash on Allwinner SoCs in SPL"

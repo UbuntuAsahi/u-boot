@@ -10,7 +10,6 @@
  * Copyright (C) 2016 Glider bvba
  */
 
-#include <common.h>
 #include <clk-uclass.h>
 #include <dm.h>
 #include <dm/device-internal.h>
@@ -307,6 +306,12 @@ static u64 gen3_clk_get_rate64(struct clk *clk)
 						gen4_pll_config->pll6_div,
 						"PLL6");
 
+	case CLK_TYPE_GEN4_PLL7:
+		return gen3_clk_get_rate64_pll_mul_reg(priv, &parent,
+						0, gen4_pll_config->pll7_mult,
+						gen4_pll_config->pll7_div,
+						"PLL7");
+
 	case CLK_TYPE_FF:
 		return gen3_clk_get_rate64_pll_mul_reg(priv, &parent,
 						0, core->mult, core->div,
@@ -526,6 +531,7 @@ U_BOOT_DRIVER(clk_gen3) = {
 	.ops		= &gen3_clk_ops,
 	.probe		= gen3_clk_probe,
 	.remove		= gen3_clk_remove,
+	.flags          = DM_FLAG_OS_PREPARE | DM_FLAG_VITAL,
 };
 
 static int gen3_reset_assert(struct reset_ctl *reset_ctl)
@@ -565,6 +571,7 @@ U_BOOT_DRIVER(rst_gen3) = {
 	.name = "rst_gen3",
 	.id = UCLASS_RESET,
 	.ops = &rst_gen3_ops,
+	.flags = DM_FLAG_OS_PREPARE | DM_FLAG_VITAL,
 };
 
 int gen3_cpg_bind(struct udevice *parent)

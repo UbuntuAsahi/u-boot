@@ -6,8 +6,7 @@
  * Copyright (C) 2021 Renesas Electronics Corp.
  */
 
-#include <common.h>
-#include <asm/arch/rmobile.h>
+#include <asm/arch/renesas.h>
 #include <asm/arch/sys_proto.h>
 #include <asm/global_data.h>
 #include <asm/io.h>
@@ -32,7 +31,7 @@ static void init_generic_timer(void)
 
 static void init_gic_v3(void)
 {
-	 /* GIC v3 power on */
+	/* GIC v3 power on */
 	writel(BIT(1), GICR_LPI_PWRR);
 
 	/* Wait till the WAKER_CA_BIT changes to 0 */
@@ -64,9 +63,4 @@ int board_init(void)
 		init_gic_v3();
 
 	return 0;
-}
-
-void reset_cpu(void)
-{
-	writel(RST_SPRES, RST_SRESCR0);
 }

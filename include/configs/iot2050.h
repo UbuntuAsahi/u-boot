@@ -13,13 +13,15 @@
 
 #include <linux/sizes.h>
 
-#if IS_ENABLED(CONFIG_CMD_USB)
-# define BOOT_TARGET_USB(func) \
+#include <configs/ti_armv7_common.h>
+
+/* allow up to 3 USB storage devices */
+#ifdef CONFIG_CMD_USB
+#undef BOOT_TARGET_USB
+#define BOOT_TARGET_USB(func) \
 	func(USB, usb, 0) \
 	func(USB, usb, 1) \
 	func(USB, usb, 2)
-#else
-# define BOOT_TARGET_USB(func)
 #endif
 
 /*
@@ -27,18 +29,11 @@
  * The non-supported device will be removed from the boot targets during
  * runtime, when that board was detected.
  */
+#undef BOOT_TARGET_DEVICES
 #define BOOT_TARGET_DEVICES(func) \
-	func(MMC, mmc, 1) \
-	func(MMC, mmc, 0) \
-	BOOT_TARGET_USB(func)
-
-#include <config_distro_bootcmd.h>
-
-#define CFG_EXTRA_ENV_SETTINGS						\
-	DEFAULT_LINUX_BOOT_ENV						\
-	BOOTENV
-
-#include <configs/ti_armv7_common.h>
+       func(MMC, mmc, 1) \
+       func(MMC, mmc, 0) \
+       BOOT_TARGET_USB(func)
 
 #ifdef CONFIG_ENV_WRITEABLE_LIST
 #define CFG_ENV_FLAGS_LIST_STATIC					\

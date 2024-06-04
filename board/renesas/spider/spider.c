@@ -6,8 +6,7 @@
  * Copyright (C) 2021 Renesas Electronics Corp.
  */
 
-#include <common.h>
-#include <asm/arch/rmobile.h>
+#include <asm/arch/renesas.h>
 #include <asm/arch/sys_proto.h>
 #include <asm/global_data.h>
 #include <asm/io.h>
@@ -64,9 +63,4 @@ int board_init(void)
 		init_gic_v3();
 
 	return 0;
-}
-
-void reset_cpu(void)
-{
-	writel(RST_SPRES, RST_SRESCR0);
 }

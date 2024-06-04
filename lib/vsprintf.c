@@ -13,7 +13,6 @@
  * from hush: simple_itoa() was lifted from boa-0.93.15
  */
 
-#include <common.h>
 #include <charset.h>
 #include <efi_loader.h>
 #include <div64.h>
@@ -680,8 +679,10 @@ repeat:
 			break;
 
 		case 'd':
-			if (fmt[1] == 'E')
+			if (fmt[1] == 'E') {
 				flags |= ERRSTR;
+				fmt++;
+			}
 		/* fallthrough */
 		case 'i':
 			flags |= SIGN;
@@ -725,7 +726,6 @@ repeat:
 			ADDCH(str, ' ');
 			for (p = errno_str(num); *p; p++)
 				ADDCH(str, *p);
-			fmt++;
 		}
 	}
 

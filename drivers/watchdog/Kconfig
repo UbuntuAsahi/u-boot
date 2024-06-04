@@ -130,6 +130,12 @@ config WDT_AT91
 	  Select this to enable Microchip watchdog timer, which can be found on
 	  some AT91 devices.
 
+config WDT_ATCWDT200
+	bool "Andes watchdog timer support"
+	depends on WDT
+	help
+	  Select this to enable Andes ATCWDT200 watchdog timer
+
 config WDT_BCM6345
 	bool "BCM6345 watchdog timer support"
 	depends on WDT && (ARCH_BMIPS || BCM6856 || \
@@ -177,6 +183,13 @@ config WDT_MAX6370
 	select DM_GPIO
 	help
 	  Select this to enable max6370 watchdog timer.
+
+config WDT_MCF
+	bool "ColdFire family watchdog timer support"
+	depends on WDT
+	help
+	  Select this to enable ColdFire watchdog timer,
+	  which supports mcf52x2 mcf532x mcf523x families.
 
 config WDT_MESON_GXBB
 	bool "Amlogic watchdog timer support"
@@ -336,6 +349,13 @@ config WDT_STM32MP
 	help
 	  Enable the STM32 watchdog (IWDG) driver. Enable support to
 	  configure STM32's on-SoC watchdog.
+
+config WDT_STARFIVE
+	bool "StarFive watchdog timer support"
+	depends on WDT
+	imply WATCHDOG
+	help
+	  Enable support for the watchdog timer of StarFive JH7110 SoC.
 
 config WDT_SUNXI
 	bool "Allwinner sunxi watchdog timer support"

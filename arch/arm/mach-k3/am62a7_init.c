@@ -14,6 +14,10 @@
 #include <dm/uclass-internal.h>
 #include <dm/pinctrl.h>
 
+struct fwl_data cbass_main_fwls[] = {
+       { "FSS_DAT_REG3", 7, 8 },
+};
+
 /*
  * This uninitialized global variable would normal end up in the .bss section,
  * but the .bss is cleared between writing and reading this variable, so move
@@ -64,20 +68,6 @@ static void ctrl_mmr_unlock(void)
 	mmr_unlock(PADCFG_MMR0_BASE, 1);
 	mmr_unlock(PADCFG_MMR1_BASE, 1);
 }
-
-#if (IS_ENABLED(CONFIG_CPU_V7R))
-static void setup_qos(void)
-{
-	u32 i;
-
-	for (i = 0; i < am62a_qos_count; i++)
-		writel(am62a_qos_data[i].val, (uintptr_t)am62a_qos_data[i].reg);
-}
-#else
-static void setup_qos(void)
-{
-}
-#endif
 
 void board_init_f(ulong dummy)
 {
@@ -166,6 +156,9 @@ void board_init_f(ulong dummy)
 	/* Output System Firmware version info */
 	k3_sysfw_print_ver();
 
+       /* Disable ROM configured firewalls right after loading sysfw */
+       remove_fwl_configs(cbass_main_fwls, ARRAY_SIZE(cbass_main_fwls));
+
 #if defined(CONFIG_K3_AM62A_DDRSS)
 	ret = uclass_get_device(UCLASS_RAM, 0, &dev);
 	if (ret)
@@ -174,7 +167,7 @@ void board_init_f(ulong dummy)
 
 	setup_qos();
 
-	printf("am62a_init: %s done\n", __func__);
+	debug("am62a_init: %s done\n", __func__);
 }
 
 static u32 __get_backup_bootmedia(u32 devstat)
@@ -272,7 +265,7 @@ u32 spl_boot_device(void)
 	else
 		bootmedia = __get_backup_bootmedia(devstat);
 
-	printf("am62a_init: %s: devstat = 0x%x bootmedia = 0x%x bootindex = %d\n",
+	debug("am62a_init: %s: devstat = 0x%x bootmedia = 0x%x bootindex = %d\n",
 	       __func__, devstat, bootmedia, bootindex);
 	return bootmedia;
 }

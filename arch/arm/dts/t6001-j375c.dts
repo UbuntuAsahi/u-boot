@@ -17,6 +17,11 @@
 	model = "Apple Mac Studio (M1 Max, 2022)";
 };
 
+&sound {
+	compatible = "apple,j375-macaudio", "apple,macaudio";
+	model = "Mac Studio J375";
+};
+
 &pinctrl_ap {
 	usb_hub_oe-hog {
 		gpio-hog;

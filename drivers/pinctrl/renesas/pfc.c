@@ -11,7 +11,6 @@
 
 #define DRV_NAME "sh-pfc"
 
-#include <common.h>
 #include <dm.h>
 #include <errno.h>
 #include <dm/device_compat.h>
@@ -45,6 +44,7 @@ enum sh_pfc_model {
 	SH_PFC_R8A779A0,
 	SH_PFC_R8A779F0,
 	SH_PFC_R8A779G0,
+	SH_PFC_R8A779H0,
 };
 
 struct sh_pfc_pin_config {
@@ -798,7 +798,7 @@ static bool sh_pfc_pinconf_validate(struct sh_pfc *pfc, unsigned int _pin,
 		return pin->configs & SH_PFC_PIN_CFG_DRIVE_STRENGTH;
 
 	case PIN_CONFIG_POWER_SOURCE:
-		return pin->configs & SH_PFC_PIN_CFG_IO_VOLTAGE;
+		return pin->configs & SH_PFC_PIN_CFG_IO_VOLTAGE_MASK;
 
 	default:
 		return false;
@@ -814,6 +814,7 @@ static int sh_pfc_pinconf_set(struct sh_pfc_pinctrl *pmx, unsigned _pin,
 	int bit, ret;
 	int idx = sh_pfc_get_pin_index(pfc, _pin);
 	const struct sh_pfc_pin *pin = &pfc->info->pins[idx];
+	unsigned int mode, hi, lo;
 
 	if (!sh_pfc_pinconf_validate(pfc, _pin, param))
 		return -ENOTSUPP;
@@ -851,8 +852,12 @@ static int sh_pfc_pinconf_set(struct sh_pfc_pinctrl *pmx, unsigned _pin,
 
 		pocctrl = (void __iomem *)(uintptr_t)addr;
 
+		mode = pin->configs & SH_PFC_PIN_CFG_IO_VOLTAGE_MASK;
+		lo = mode <= SH_PFC_PIN_CFG_IO_VOLTAGE_18_33 ? 1800 : 2500;
+		hi = mode >= SH_PFC_PIN_CFG_IO_VOLTAGE_18_33 ? 3300 : 2500;
+
 		val = sh_pfc_read_raw_reg(pocctrl, 32);
-		if (arg == ((pin->configs & SH_PFC_PIN_VOLTAGE_18_25) ? 2500 : 3300))
+		if (arg == hi)
 			val |= BIT(bit);
 		else
 			val &= ~BIT(bit);
@@ -1037,6 +1042,10 @@ static int sh_pfc_pinctrl_probe(struct udevice *dev)
 	if (model == SH_PFC_R8A779G0)
 		priv->pfc.info = &r8a779g0_pinmux_info;
 #endif
+#ifdef CONFIG_PINCTRL_PFC_R8A779H0
+	if (model == SH_PFC_R8A779H0)
+		priv->pfc.info = &r8a779h0_pinmux_info;
+#endif
 
 	priv->pmx.pfc = &priv->pfc;
 	sh_pfc_init_ranges(&priv->pfc);
@@ -1164,6 +1173,12 @@ static const struct udevice_id sh_pfc_pinctrl_ids[] = {
 	{
 		.compatible = "renesas,pfc-r8a779g0",
 		.data = SH_PFC_R8A779G0,
+	},
+#endif
+#ifdef CONFIG_PINCTRL_PFC_R8A779H0
+	{
+		.compatible = "renesas,pfc-r8a779h0",
+		.data = SH_PFC_R8A779H0,
 	},
 #endif
 

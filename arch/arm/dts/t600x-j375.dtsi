@@ -16,10 +16,13 @@
 		atcphy2 = &atcphy2;
 		atcphy3 = &atcphy3;
 		bluetooth0 = &bluetooth0;
+		#ifndef NO_DCP
 		dcp = &dcp;
 		disp0 = &display;
 		disp0_piodma = &disp0_piodma;
+		#endif
 		ethernet0 = &ethernet0;
+		nvram = &nvram;
 		serial0 = &serial0;
 		wifi0 = &wifi0;
 	};
@@ -267,6 +270,9 @@
 		reg = <0x38>;
 		shutdown-gpios = <&pinctrl_ap 178 GPIO_ACTIVE_HIGH>;
 		#sound-dai-cells = <0>;
+		interrupts-extended = <&pinctrl_ap 179 IRQ_TYPE_LEVEL_LOW>;
+		ti,imon-slot-no = <0>;
+		ti,vmon-slot-no = <2>;
 	};
 };
 
@@ -289,19 +295,11 @@
 
 / {
 	sound: sound {
-		compatible = "apple,j375-macaudio", "apple,macaudio";
-		model = "Mac Studio J375";
+		/* compatible is set per machine */
 
 		dai-link@0 {
 			link-name = "Speaker";
-			/*
-			* DANGER ZONE: You can blow your speakers!
-			*
-			* The drivers are not ready, and unless you are careful
-			* to attenuate the audio stream, you run the risk of
-			* blowing your speakers.
-			*/
-			status = "disabled";
+
 			cpu {
 				sound-dai = <&mca 0>;
 			};
@@ -397,3 +395,5 @@
 	apple,ppm-kp = <0.355>;
 };
 #endif
+
+#include "spi1-nvram.dtsi"

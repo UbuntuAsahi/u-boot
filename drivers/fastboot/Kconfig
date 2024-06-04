@@ -1,4 +1,5 @@
 menu "Fastboot support"
+	depends on CMDLINE
 
 config FASTBOOT
 	bool
@@ -56,7 +57,7 @@ config FASTBOOT_BUF_ADDR
 				ROCKCHIP_RK3399
 	default 0x280000 if ROCKCHIP_RK3368
 	default 0x100000 if ARCH_ZYNQMP
-	default 0 if SANDBOX
+	default 0x0 if SANDBOX
 	help
 	  The fastboot protocol requires a large memory buffer for
 	  downloads. Define this to the starting RAM address to use for
@@ -240,6 +241,13 @@ config FASTBOOT_OEM_RUN
 	  command allows running arbitrary U-Boot shell commands. Do not enable
 	  this feature if you are using verified boot, as it will allow an
 	  attacker to bypass any restrictions you have in place.
+
+config FASTBOOT_CMD_OEM_CONSOLE
+	bool "Enable the 'oem console' command"
+	depends on CONSOLE_RECORD
+	help
+	  Add support for the "oem console" command to input and read console
+	  record buffer.
 
 endif # FASTBOOT
 

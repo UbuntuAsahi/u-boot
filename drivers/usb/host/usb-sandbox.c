@@ -68,7 +68,7 @@ static int sandbox_submit_control(struct udevice *bus,
 		}
 	}
 
-	ret = usb_emul_control(emul, udev, pipe, buffer, length, setup);
+	ret = usb_emul_control(emul, udev, pipe, buffer, length, setup, timeout);
 	if (ret < 0) {
 		debug("ret=%d\n", ret);
 		udev->status = ret;
@@ -94,7 +94,7 @@ static int sandbox_submit_bulk(struct udevice *bus, struct usb_device *udev,
 	usbmon_trace(bus, pipe, NULL, emul);
 	if (ret)
 		return ret;
-	ret = usb_emul_bulk(emul, udev, pipe, buffer, length);
+	ret = usb_emul_bulk(emul, udev, pipe, buffer, length, timeout);
 	if (ret < 0) {
 		debug("ret=%d\n", ret);
 		udev->status = ret;
@@ -126,11 +126,12 @@ static int sandbox_submit_int(struct udevice *bus, struct usb_device *udev,
 	return ret;
 }
 
-int usb_gadget_handle_interrupts(int index)
+#if CONFIG_IS_ENABLED(DM_USB_GADGET)
+int dm_usb_gadget_handle_interrupts(struct udevice *dev)
 {
 	return 0;
 }
-
+#else
 int usb_gadget_register_driver(struct usb_gadget_driver *driver)
 {
 	struct sandbox_udc *dev = this_controller;
@@ -146,6 +147,7 @@ int usb_gadget_unregister_driver(struct usb_gadget_driver *driver)
 
 	return 0;
 }
+#endif
 
 static int sandbox_alloc_device(struct udevice *dev, struct usb_device *udev)
 {

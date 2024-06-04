@@ -10,9 +10,11 @@
 #include <command.h>
 #include <dm.h>
 #include <env.h>
+#include <getopt.h>
 #include <lmb.h>
 #include <mapmem.h>
 #include <net.h>
+#include <serial.h>
 #include <video.h>
 #include <vsprintf.h>
 #include <asm/cache.h>
@@ -113,10 +115,27 @@ static void show_video_info(void)
 	}
 }
 
-int do_bdinfo(struct cmd_tbl *cmdtp, int flag, int argc, char *const argv[])
+static void print_serial(struct udevice *dev)
 {
-	struct bd_info *bd = gd->bd;
+	struct serial_device_info info;
+	int ret;
 
+	if (!dev || !IS_ENABLED(CONFIG_DM_SERIAL))
+		return;
+
+	ret = serial_getinfo(dev, &info);
+	if (ret)
+		return;
+
+	bdinfo_print_num_l("serial addr", info.addr);
+	bdinfo_print_num_l(" width", info.reg_width);
+	bdinfo_print_num_l(" shift", info.reg_shift);
+	bdinfo_print_num_l(" offset", info.reg_offset);
+	bdinfo_print_num_l(" clock", info.clock);
+}
+
+static int bdinfo_print_all(struct bd_info *bd)
+{
 #ifdef DEBUG
 	bdinfo_print_num_l("bd address", (ulong)bd);
 #endif
@@ -151,14 +170,51 @@ int do_bdinfo(struct cmd_tbl *cmdtp, int flag, int argc, char *const argv[])
 		if (IS_ENABLED(CONFIG_OF_REAL))
 			printf("devicetree  = %s\n", fdtdec_get_srcname());
 	}
+	print_serial(gd->cur_serial_dev);
+
+	if (IS_ENABLED(CONFIG_CMD_BDINFO_EXTRA)) {
+		bdinfo_print_num_ll("stack ptr", (ulong)&bd);
+		bdinfo_print_num_ll("ram_top ptr", (ulong)gd->ram_top);
+		bdinfo_print_num_l("malloc base", gd_malloc_start());
+	}
 
 	arch_print_bdinfo();
 
 	return 0;
 }
 
+int do_bdinfo(struct cmd_tbl *cmdtp, int flag, int argc, char *const argv[])
+{
+	struct bd_info *bd = gd->bd;
+	struct getopt_state gs;
+	int opt;
+
+	if (!CONFIG_IS_ENABLED(GETOPT) || argc == 1)
+		return bdinfo_print_all(bd);
+
+	getopt_init_state(&gs);
+	while ((opt = getopt(&gs, argc, argv, "aem")) > 0) {
+		switch (opt) {
+		case 'a':
+			return bdinfo_print_all(bd);
+		case 'e':
+			if (!IS_ENABLED(CONFIG_CMD_NET))
+				return CMD_RET_USAGE;
+			print_eth();
+			return CMD_RET_SUCCESS;
+		case 'm':
+			print_bi_dram(bd);
+			return CMD_RET_SUCCESS;
+		default:
+			return CMD_RET_USAGE;
+		}
+	}
+
+	return CMD_RET_USAGE;
+}
+
 U_BOOT_CMD(
-	bdinfo,	1,	1,	do_bdinfo,
+	bdinfo,	2,	1,	do_bdinfo,
 	"print Board Info structure",
 	""
 );

@@ -56,6 +56,7 @@ int enable_i2c_clk(unsigned char enable, unsigned i2c_num)
 static struct imx_int_pll_rate_table imx8mm_fracpll_tbl[] = {
 	PLL_1443X_RATE(1000000000U, 250, 3, 1, 0),
 	PLL_1443X_RATE(933000000U, 311, 4, 1, 0),
+	PLL_1443X_RATE(900000000U, 300, 8, 0, 0),
 	PLL_1443X_RATE(800000000U, 300, 9, 0, 0),
 	PLL_1443X_RATE(750000000U, 250, 8, 0, 0),
 	PLL_1443X_RATE(650000000U, 325, 3, 2, 0),
@@ -90,7 +91,6 @@ static int fracpll_configure(enum pll_clocks pll, u32 freq)
 	case ANATOP_DRAM_PLL:
 		setbits_le32(GPC_BASE_ADDR + 0xEC, 1 << 7);
 		setbits_le32(GPC_BASE_ADDR + 0xF8, 1 << 5);
-		writel(SRC_DDR1_ENABLE_MASK, SRC_BASE_ADDR + 0x1004);
 
 		pll_base = &ana_pll->dram_pll_gnrl_ctl;
 		break;
@@ -903,6 +903,13 @@ static int imx8mp_fec_interface_init(struct udevice *dev,
 		return -EINVAL;
 	}
 
+	return 0;
+}
+#else
+static int imx8mp_fec_interface_init(struct udevice *dev,
+				     phy_interface_t interface_type,
+				     bool mx8mp)
+{
 	return 0;
 }
 #endif

@@ -554,7 +554,7 @@ static int label_boot(struct pxe_context *ctx, struct pxe_label *label)
 			       label->name);
 			goto cleanup;
 		}
-
+		strcpy(initrd_filesize, simple_xtoa(size));
 		initrd_addr_str = env_get("ramdisk_addr_r");
 		size = snprintf(initrd_str, sizeof(initrd_str), "%s:%lx",
 				initrd_addr_str, size);
@@ -700,10 +700,15 @@ static int label_boot(struct pxe_context *ctx, struct pxe_label *label)
 					       label->name);
 					goto cleanup;
 				}
+
+				if (label->fdtdir) {
+					printf("Skipping fdtdir %s for failure retrieving dts\n",
+						label->fdtdir);
+				}
 			}
 
-		if (label->kaslrseed)
-			label_boot_kaslrseed();
+			if (label->kaslrseed)
+				label_boot_kaslrseed();
 
 #ifdef CONFIG_OF_LIBFDT_OVERLAY
 			if (label->fdtoverlays)

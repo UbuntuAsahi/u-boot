@@ -46,13 +46,20 @@ void ddr_load_train_firmware(enum fw_type type)
 	u32 error = 0;
 	unsigned long pr_to32, pr_from32;
 	uint32_t fw_offset = type ? IMEM_2D_OFFSET : 0;
-	unsigned long imem_start = (unsigned long)&_end + fw_offset;
+	unsigned long imem_start = (unsigned long)_end + fw_offset;
 	unsigned long dmem_start;
 	unsigned long imem_len = IMEM_LEN, dmem_len = DMEM_LEN;
+	static enum fw_type last_type = -1;
+
+	/* If FW doesn't change, we can save the loading. */
+	if (last_type == type)
+		return;
+
+	last_type = type;
 
 #ifdef CONFIG_SPL_OF_CONTROL
 	if (gd->fdt_blob && !fdt_check_header(gd->fdt_blob)) {
-		imem_start = roundup((unsigned long)&_end +
+		imem_start = roundup((unsigned long)_end +
 				     fdt_totalsize(gd->fdt_blob), 4) +
 			fw_offset;
 	}

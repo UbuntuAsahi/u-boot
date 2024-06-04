@@ -2,12 +2,11 @@
 /*
  * K3: J721E SoC definitions, structures etc.
  *
- * (C) Copyright (C) 2018-2019 Texas Instruments Incorporated - http://www.ti.com/
+ * (C) Copyright (C) 2018-2019 Texas Instruments Incorporated - https://www.ti.com/
  */
 #ifndef __ASM_ARCH_J721E_HARDWARE_H
 #define __ASM_ARCH_J721E_HARDWARE_H
 
-#include <config.h>
 #ifndef __ASSEMBLY__
 #include <linux/bitops.h>
 #endif

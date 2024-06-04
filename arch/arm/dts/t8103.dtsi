@@ -194,26 +194,31 @@
 			opp-hz = /bits/ 64 <600000000>;
 			opp-level = <1>;
 			clock-latency-ns = <7500>;
+			opp-microwatt = <47296>;
 		};
 		opp02 {
 			opp-hz = /bits/ 64 <972000000>;
 			opp-level = <2>;
 			clock-latency-ns = <22000>;
+			opp-microwatt = <99715>;
 		};
 		opp03 {
 			opp-hz = /bits/ 64 <1332000000>;
 			opp-level = <3>;
 			clock-latency-ns = <27000>;
+			opp-microwatt = <188860>;
 		};
 		opp04 {
 			opp-hz = /bits/ 64 <1704000000>;
 			opp-level = <4>;
 			clock-latency-ns = <33000>;
+			opp-microwatt = <288891>;
 		};
 		opp05 {
 			opp-hz = /bits/ 64 <2064000000>;
 			opp-level = <5>;
 			clock-latency-ns = <50000>;
+			opp-microwatt = <412979>;
 		};
 	};
 
@@ -224,79 +229,94 @@
 			opp-hz = /bits/ 64 <600000000>;
 			opp-level = <1>;
 			clock-latency-ns = <8000>;
+			opp-microwatt = <290230>;
 		};
 		opp02 {
 			opp-hz = /bits/ 64 <828000000>;
 			opp-level = <2>;
 			clock-latency-ns = <19000>;
+			opp-microwatt = <449013>;
 		};
 		opp03 {
 			opp-hz = /bits/ 64 <1056000000>;
 			opp-level = <3>;
 			clock-latency-ns = <21000>;
+			opp-microwatt = <647097>;
 		};
 		opp04 {
 			opp-hz = /bits/ 64 <1284000000>;
 			opp-level = <4>;
 			clock-latency-ns = <23000>;
+			opp-microwatt = <865620>;
 		};
 		opp05 {
 			opp-hz = /bits/ 64 <1500000000>;
 			opp-level = <5>;
 			clock-latency-ns = <24000>;
+			opp-microwatt = <1112838>;
 		};
 		opp06 {
 			opp-hz = /bits/ 64 <1728000000>;
 			opp-level = <6>;
 			clock-latency-ns = <29000>;
+			opp-microwatt = <1453271>;
 		};
 		opp07 {
 			opp-hz = /bits/ 64 <1956000000>;
 			opp-level = <7>;
 			clock-latency-ns = <31000>;
+			opp-microwatt = <1776667>;
 		};
 		opp08 {
 			opp-hz = /bits/ 64 <2184000000>;
 			opp-level = <8>;
 			clock-latency-ns = <34000>;
+			opp-microwatt = <2366690>;
 		};
 		opp09 {
 			opp-hz = /bits/ 64 <2388000000>;
 			opp-level = <9>;
 			clock-latency-ns = <36000>;
+			opp-microwatt = <2892193>;
 		};
 		opp10 {
 			opp-hz = /bits/ 64 <2592000000>;
 			opp-level = <10>;
 			clock-latency-ns = <51000>;
+			opp-microwatt = <3475417>;
 		};
 		opp11 {
 			opp-hz = /bits/ 64 <2772000000>;
 			opp-level = <11>;
 			clock-latency-ns = <54000>;
+			opp-microwatt = <3959410>;
 		};
 		opp12 {
 			opp-hz = /bits/ 64 <2988000000>;
 			opp-level = <12>;
 			clock-latency-ns = <55000>;
+			opp-microwatt = <4540620>;
 		};
 		/* Not available until CPU deep sleep is implemented */
 		opp13 {
 			opp-hz = /bits/ 64 <3096000000>;
 			opp-level = <13>;
 			clock-latency-ns = <55000>;
+			opp-microwatt = <4745031>;
 			turbo-mode;
 		};
 		opp14 {
 			opp-hz = /bits/ 64 <3144000000>;
 			opp-level = <14>;
 			clock-latency-ns = <56000>;
+			opp-microwatt = <4822390>;
 			turbo-mode;
 		};
 		opp15 {
 			opp-hz = /bits/ 64 <3204000000>;
 			opp-level = <15>;
 			clock-latency-ns = <56000>;
+			opp-microwatt = <4951324>;
 			turbo-mode;
 		};
 	};
@@ -396,6 +416,14 @@
 		clock-output-names = "clk_disp0";
 	};
 
+	/* Pixel clock? frequency in Hz (compare: 4K@60 VGA clock 533.250 MHz) */
+	clk_dispext0: clock-dispext0 {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency = <0>;
+		clock-output-names = "clk_dispext0";
+	};
+
 	/*
 	 * This is a fabulated representation of the input clock
 	 * to NCO since we don't know the true clock tree.
@@ -412,17 +440,17 @@
 		ranges;
 
 		uat_handoff: uat-handoff {
-			reg = <0x9 0xfff74000 0 0x4000>;
+			reg = <0 0 0 0>;
 			no-map;
 		};
 
 		uat_pagetables: uat-pagetables {
-			reg = <0x9 0xfff78000 0 0x40000>;
+			reg = <0 0 0 0>;
 			no-map;
 		};
 
 		uat_ttbs: uat-ttbs {
-			reg = <0x9 0xfffb8000 0 0x4000>;
+			reg = <0 0 0 0>;
 			no-map;
 		};
 	};
@@ -525,21 +553,12 @@
 				<AIC_IRQ 506 IRQ_TYPE_LEVEL_HIGH>;
 			interrupt-names = "be", "fe";
 			status = "disabled";
-			iommus = <&displaydfr_dart_1 0>;
+			iommus = <&displaydfr_dart 0>;
 			#address-cells = <1>;
 			#size-cells = <0>;
 		};
 
-		displaydfr_dart_0: iommu@228300000 {
-			compatible = "apple,t8103-dart";
-			reg = <0x2 0x28300000 0x0 0x4000>;
-			interrupt-parent = <&aic>;
-			interrupts = <AIC_IRQ 504 IRQ_TYPE_LEVEL_HIGH>;
-			#iommu-cells = <1>;
-			power-domains = <&ps_dispdfr_fe>;
-		};
-
-		displaydfr_dart_1: iommu@228304000 {
+		displaydfr_dart: iommu@228304000 {
 			compatible = "apple,t8103-dart";
 			reg = <0x2 0x28304000 0x0 0x4000>;
 			interrupt-parent = <&aic>;
@@ -555,6 +574,7 @@
 			interrupt-parent = <&aic>;
 			interrupts = <AIC_IRQ 445 IRQ_TYPE_LEVEL_HIGH>;
 			power-domains = <&ps_disp0_cpu0>;
+			apple,dma-range = <0x0 0x0 0x0 0xfc000000>;
 			status = "disabled";
 		};
 
@@ -564,6 +584,7 @@
 			#iommu-cells = <1>;
 			interrupt-parent = <&aic>;
 			interrupts = <AIC_IRQ 445 IRQ_TYPE_LEVEL_HIGH>;
+			apple,dma-range = <0xf 0x00000000 0x0 0xfc000000>;
 			power-domains = <&ps_disp0_cpu0>;
 		};
 
@@ -589,19 +610,18 @@
 			iommus = <&dcp_dart 0>;
 
 			reg-names = "coproc", "disp-0", "disp-1", "disp-2",
-				"disp-3", "disp-4", "disp-5", "doorbell";
+				"disp-3", "disp-4";
 			reg = <0x2 0x31c00000 0x0 0x4000>,
 				<0x2 0x30000000 0x0 0x3e8000>,
 				<0x2 0x31320000 0x0 0x4000>,
 				<0x2 0x31344000 0x0 0x4000>,
 				<0x2 0x31800000 0x0 0x800000>,
-				<0x2 0x3b3d0000 0x0 0x4000>,
-				<0x2 0x3b738000 0x0 0x1000>,
-				<0x2 0x3bc3c000 0x0 0x1000>;
+				<0x2 0x3b3d0000 0x0 0x4000>;
+			apple,bw-scratch = <&pmgr_dcp 0 5 0x14>;
+			apple,bw-doorbell = <&pmgr_dcp 1 6>;
 			power-domains = <&ps_disp0_cpu0>;
 			resets = <&ps_disp0_cpu0>;
 			clocks = <&clk_disp0>;
-			apple,asc-dram-mask = <0xf 0x00000000>;
 			phandle = <&dcp>;
 
 			disp0_piodma: piodma {
@@ -612,9 +632,65 @@
 
 		display: display-subsystem {
 			compatible = "apple,display-subsystem";
+			/* disp_dart0 must be 1st since it is locked */
 			iommus = <&disp0_dart 0>;
 			/* generate phandle explicitly for use in loader */
 			phandle = <&display>;
+		};
+
+		isp_dart0: iommu@22c0e8000 {
+			compatible = "apple,t8103-dart";
+			reg = <0x2 0x2c0e8000 0x0 0x4000>;
+			#iommu-cells = <1>;
+			interrupt-parent = <&aic>;
+			interrupts = <AIC_IRQ 251 IRQ_TYPE_LEVEL_HIGH>;
+			power-domains = <&ps_isp_sys>;
+
+			status = "disabled";
+		};
+
+		isp_dart1: iommu@22c0f4000 {
+			compatible = "apple,t8103-dart";
+			reg = <0x2 0x2c0f4000 0x0 0x4000>;
+			#iommu-cells = <1>;
+			interrupt-parent = <&aic>;
+			interrupts = <AIC_IRQ 251 IRQ_TYPE_LEVEL_HIGH>;
+			power-domains = <&ps_isp_sys>;
+
+			status = "disabled";
+		};
+
+		isp_dart2: iommu@22c0fc000 {
+			compatible = "apple,t8103-dart";
+			reg = <0x2 0x2c0fc000 0x0 0x4000>;
+			#iommu-cells = <1>;
+			interrupt-parent = <&aic>;
+			interrupts = <AIC_IRQ 251 IRQ_TYPE_LEVEL_HIGH>;
+			power-domains = <&ps_isp_sys>;
+
+			status = "disabled";
+		};
+
+		isp: isp@22a000000 {
+			compatible = "apple,t8103-isp", "apple,isp";
+			iommus = <&isp_dart0 0>, <&isp_dart1 0>, <&isp_dart2 0>;
+			reg-names = "coproc", "mbox", "gpio", "mbox2";
+			reg = <0x2 0x2a000000 0x0 0x2000000>,
+				<0x2 0x2c104000 0x0 0x100>,
+				<0x2 0x2c104170 0x0 0x100>,
+				<0x2 0x2c1043f0 0x0 0x100>;
+			interrupt-parent = <&aic>;
+			interrupts = <AIC_IRQ 246 IRQ_TYPE_LEVEL_HIGH>;
+			power-domains = <&ps_isp_sys>, <&ps_isp_set0>,
+				<&ps_isp_set1>, <&ps_isp_set2>, <&ps_isp_fe>,
+				<&ps_isp_set4>, <&ps_isp_set5>, <&ps_isp_set6>,
+				<&ps_isp_set7>, <&ps_isp_set8>, <&ps_isp_set9>,
+				<&ps_isp_set10>, <&ps_isp_set11>,
+				<&ps_isp_set12>;
+
+			apple,dart-vm-size = <0x0 0xa0000000>;
+
+			status = "disabled";
 		};
 
 		sio_dart: iommu@235004000 {
@@ -725,25 +801,7 @@
 			power-domains = <&ps_spi1>;
 			#address-cells = <1>;
 			#size-cells = <0>;
-
-			flash@0 {
-				compatible = "jedec,spi-nor";
-				reg = <0x0>;
-				spi-max-frequency = <25000000>;
-				#address-cells = <1>;
-				#size-cells = <1>;
-
-				partitions {
-					compatible = "fixed-partitions";
-					#address-cells = <1>;
-					#size-cells = <1>;
-
-					partition@700000 {
-						label = "nvram";
-						reg = <0x700000 0x20000>;
-					};
-				};
-			};
+			status = "disabled";
 		};
 
 		spi3: spi@23510c000 {
@@ -868,6 +926,14 @@
 			#address-cells = <1>;
 			#size-cells = <1>;
 			reg = <0x2 0x3b700000 0 0x14000>;
+		};
+
+		pmgr_dcp: power-management@23b738000 {
+			reg = <0x2 0x3b738000 0x0 0x1000>,
+				<0x2 0x3bc3c000 0x0 0x1000>;
+			reg-names = "dcp-bw-scratch", "dcp-bw-doorbell";
+			#apple,bw-scratch-cells = <3>;
+			#apple,bw-doorbell-cells = <2>;
 		};
 
 		pinctrl_ap: pinctrl@23c100000 {
@@ -1127,6 +1193,71 @@
 				     <AIC_IRQ 272 IRQ_TYPE_LEVEL_HIGH>,
 				     <AIC_IRQ 273 IRQ_TYPE_LEVEL_HIGH>,
 				     <AIC_IRQ 274 IRQ_TYPE_LEVEL_HIGH>;
+		};
+
+		dispext0_dart: iommu@271304000 {
+			compatible = "apple,t8103-dart";
+			reg = <0x2 0x71304000 0x0 0x4000>;
+			#iommu-cells = <1>;
+			interrupt-parent = <&aic>;
+			interrupts = <AIC_IRQ 481 IRQ_TYPE_LEVEL_HIGH>;
+			power-domains = <&ps_dispext_cpu0>;
+			status = "disabled";
+		};
+
+		dcpext_dart: iommu@27130c000 {
+			compatible = "apple,t8103-dart";
+			reg = <0x2 0x7130c000 0x0 0x4000>;
+			#iommu-cells = <1>;
+			interrupt-parent = <&aic>;
+			interrupts = <AIC_IRQ 481 IRQ_TYPE_LEVEL_HIGH>;
+			power-domains = <&ps_dispext_cpu0>;
+			status = "disabled";
+		};
+
+		dcpext_mbox: mbox@271c08000 {
+			compatible = "apple,t8103-asc-mailbox", "apple,asc-mailbox-v4";
+			reg = <0x2 0x71c08000 0x0 0x4000>;
+			interrupt-parent = <&aic>;
+			interrupts = <AIC_IRQ 466 IRQ_TYPE_LEVEL_HIGH>,
+			<AIC_IRQ 467 IRQ_TYPE_LEVEL_HIGH>,
+			<AIC_IRQ 468 IRQ_TYPE_LEVEL_HIGH>,
+			<AIC_IRQ 469 IRQ_TYPE_LEVEL_HIGH>;
+			interrupt-names = "send-empty", "send-not-empty",
+			"recv-empty", "recv-not-empty";
+			#mbox-cells = <0>;
+			power-domains = <&ps_dispext_cpu0>;
+			resets = <&ps_dispext_cpu0>;
+			status = "disabled";
+		};
+
+		dcpext: dcp@271c00000 {
+			compatible = "apple,t8103-dcpext", "apple,dcpext";
+			mboxes = <&dcpext_mbox>;
+			mbox-names = "mbox";
+			iommus = <&dcpext_dart 0>;
+			phandle = <&dcpext>;
+
+			reg-names = "coproc", "disp-0", "disp-1", "disp-2",
+			"disp-3", "disp-4";
+			reg = <0x2 0x71c00000 0x0 0x4000>,
+			      <0x2 0x70000000 0x0 0x118000>,
+			      <0x2 0x71320000 0x0 0x4000>,
+			      <0x2 0x71344000 0x0 0x4000>,
+			      <0x2 0x71800000 0x0 0x800000>,
+			      <0x2 0x3b3d0000 0x0 0x4000>;
+			apple,bw-scratch = <&pmgr_dcp 0 5 0x18>;
+			apple,bw-doorbell = <&pmgr_dcp 1 6>;
+			power-domains = <&ps_dispext_cpu0>;
+			resets = <&ps_dispext_cpu0>;
+			clocks = <&clk_dispext0>;
+			apple,asc-dram-mask = <0xf 0x00000000>;
+			status = "disabled";
+
+			dispext0_piodma: piodma {
+				iommus = <&dispext0_dart 4>;
+				phandle = <&dispext0_piodma>;
+			};
 		};
 
 		ans_mbox: mbox@277408000 {

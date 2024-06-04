@@ -4,7 +4,6 @@
 
 / {
 	chosen {
-		stdout-path = &uart2;
 		u-boot,spl-boot-order = "same-as-spl", &sdmmc1, &sdmmc0;
 	};
 
@@ -46,7 +45,17 @@
 			<&pmucru CLK_RTC32K_FRAC>;
 };
 
+&dsi_dphy0 {
+	status = "okay";
+};
+
+&dsi0 {
+	status = "okay";
+};
+
 &i2c2 {
+	pinctrl-0 = <&i2c2m1_xfer>;
+	pinctrl-names = "default";
 	status = "okay";
 };
 
@@ -76,11 +85,5 @@
 	non-removable;
 	vmmc-supply = <&vcc_3v3>;
 	vqmmc-supply = <&vcc_1v8>;
-	status = "okay";
-};
-
-&uart2 {
-	clock-frequency = <24000000>;
-	bootph-all;
 	status = "okay";
 };

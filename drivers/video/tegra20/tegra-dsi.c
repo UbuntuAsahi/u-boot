@@ -14,6 +14,7 @@
 #include <panel.h>
 #include <linux/delay.h>
 #include <linux/err.h>
+#include <linux/time.h>
 #include <power/regulator.h>
 
 #include <asm/gpio.h>
@@ -23,9 +24,6 @@
 #include <asm/arch-tegra30/dsi.h>
 
 #include "mipi-phy.h"
-
-#define USEC_PER_SEC	1000000L
-#define NSEC_PER_SEC	1000000000L
 
 struct tegra_dsi_priv {
 	struct mipi_dsi_host host;
@@ -831,11 +829,9 @@ static int tegra_dsi_bridge_probe(struct udevice *dev)
 
 	tegra_dsi_get_format(device->format, &priv->format);
 
-	if (priv->avdd) {
-		ret = regulator_set_enable(priv->avdd, true);
-		if (ret)
-			return ret;
-	}
+	ret = regulator_set_enable_if_allowed(priv->avdd, true);
+	if (ret && ret != -ENOSYS)
+		return ret;
 
 	tegra_dsi_init_clocks(dev);
 

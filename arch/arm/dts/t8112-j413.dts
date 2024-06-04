@@ -95,21 +95,39 @@
 	};
 };
 
+/* Virtual regulator representing the shared shutdown GPIO */
+/ {
+	speaker_sdz: fixed-regulator-sn012776-sdz {
+		compatible = "regulator-fixed";
+		regulator-name = "sn012776-sdz";
+		startup-delay-us = <5000>;
+		gpios = <&pinctrl_ap 88 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+	};
+};
+
 &i2c1 {
 	speaker_left_woof: codec@38 {
 		compatible = "ti,sn012776", "ti,tas2764";
 		reg = <0x38>;
-		shutdown-gpios = <&pinctrl_ap 88 GPIO_ACTIVE_HIGH>;
+		SDZ-supply = <&speaker_sdz>;
 		#sound-dai-cells = <0>;
 		sound-name-prefix = "Left Woofer";
+		interrupts-extended = <&pinctrl_ap 11 IRQ_TYPE_LEVEL_LOW>;
+		ti,imon-slot-no = <0>;
+		ti,vmon-slot-no = <2>;
+		ti,sdout-force-zero-mask = <0xf0f0>;
 	};
 
 	speaker_left_tweet: codec@39 {
 		compatible = "ti,sn012776", "ti,tas2764";
 		reg = <0x39>;
-		shutdown-gpios = <&pinctrl_ap 88 GPIO_ACTIVE_HIGH>;
+		SDZ-supply = <&speaker_sdz>;
 		#sound-dai-cells = <0>;
 		sound-name-prefix = "Left Tweeter";
+		interrupts-extended = <&pinctrl_ap 11 IRQ_TYPE_LEVEL_LOW>;
+		ti,imon-slot-no = <8>;
+		ti,vmon-slot-no = <10>;
 	};
 };
 
@@ -117,17 +135,24 @@
 	speaker_right_woof: codec@3b {
 		compatible = "ti,sn012776", "ti,tas2764";
 		reg = <0x3b>;
-		shutdown-gpios = <&pinctrl_ap 88 GPIO_ACTIVE_HIGH>;
+		SDZ-supply = <&speaker_sdz>;
 		#sound-dai-cells = <0>;
 		sound-name-prefix = "Right Woofer";
+		interrupts-extended = <&pinctrl_ap 11 IRQ_TYPE_LEVEL_LOW>;
+		ti,imon-slot-no = <4>;
+		ti,vmon-slot-no = <6>;
+		ti,sdout-force-zero-mask = <0x0f0f>;
 	};
 
 	speaker_right_tweet: codec@3c {
 		compatible = "ti,sn012776", "ti,tas2764";
 		reg = <0x3c>;
-		shutdown-gpios = <&pinctrl_ap 88 GPIO_ACTIVE_HIGH>;
+		SDZ-supply = <&speaker_sdz>;
 		#sound-dai-cells = <0>;
 		sound-name-prefix = "Right Tweeter";
+		interrupts-extended = <&pinctrl_ap 11 IRQ_TYPE_LEVEL_LOW>;
+		ti,imon-slot-no = <12>;
+		ti,vmon-slot-no = <14>;
 	};
 
 	jack_codec: codec@4b {
@@ -156,21 +181,12 @@
 		dai-link@0 {
 			link-name = "Speakers";
 
-			/*
-			 * DANGER ZONE: You can blow your speakers!
-			 *
-			 * The drivers are not ready, and unless you are careful
-			 * to attenuate the audio stream, you run the risk of
-			 * blowing your speakers.
-			 */
-			status = "disabled";
-
 			cpu {
 				sound-dai = <&mca 0>, <&mca 1>;
 			};
 			codec {
-				sound-dai = <&speaker_left_tweet>, <&speaker_left_woof>,
-					    <&speaker_right_tweet>, <&speaker_right_woof>;
+				sound-dai = <&speaker_left_woof>, <&speaker_left_tweet>,
+					    <&speaker_right_woof>, <&speaker_right_tweet>;
 			};
 		};
 
@@ -220,4 +236,11 @@
 
 	tp_accel {
 	};
+};
+
+#include "isp-imx558-cfg0.dtsi"
+
+&isp {
+	apple,platform-id = <14>;
+	apple,temporal-filter = <1>;
 };

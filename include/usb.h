@@ -49,6 +49,12 @@ extern bool usb_started; /* flag for the started/stopped USB status */
  */
 #define USB_TIMEOUT_MS(pipe) (usb_pipebulk(pipe) ? 5000 : 1000)
 
+/*
+ * The xhcd hcd driver prepares only a limited number interfaces / endpoints.
+ * Define this limit so that drivers do not exceed it.
+ */
+#define USB_MAX_ACTIVE_INTERFACES	2
+
 /* device request (setup) */
 struct devrequest {
 	__u8	requesttype;
@@ -258,7 +264,14 @@ int usb_kbd_deregister(int force);
 
 #endif
 /* routines */
-int usb_init(void); /* initialize the USB Controller */
+
+/*
+ * usb_init() - initialize the USB Controllers
+ *
+ * Returns: 0 if OK, -ENOENT if there are no USB devices
+ */
+int usb_init(void);
+
 int usb_stop(void); /* stop the USB Controller */
 int usb_detect_change(void); /* detect if a USB device has been (un)plugged */
 
@@ -1024,7 +1037,7 @@ int usb_emul_setup_device(struct udevice *dev, struct usb_string *strings,
  */
 int usb_emul_control(struct udevice *emul, struct usb_device *udev,
 		     unsigned long pipe, void *buffer, int length,
-		     struct devrequest *setup);
+		     struct devrequest *setup, int timeout);
 
 /**
  * usb_emul_bulk() - Send a bulk packet to an emulator
@@ -1035,7 +1048,7 @@ int usb_emul_control(struct udevice *emul, struct usb_device *udev,
  * Return: 0 if OK, -ve on error
  */
 int usb_emul_bulk(struct udevice *emul, struct usb_device *udev,
-		  unsigned long pipe, void *buffer, int length);
+		  unsigned long pipe, void *buffer, int length, int timeout);
 
 /**
  * usb_emul_int() - Send an interrupt packet to an emulator

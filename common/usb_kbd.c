@@ -24,6 +24,18 @@
 #include <usb.h>
 
 /*
+ * USB vendor and product IDs used for quirks.
+ */
+#define USB_VENDOR_ID_APPLE	0x05ac
+#define USB_DEVICE_ID_APPLE_MAGIC_KEYBOARD_2021			0x029c
+#define USB_DEVICE_ID_APPLE_MAGIC_KEYBOARD_FINGERPRINT_2021	0x029a
+#define USB_DEVICE_ID_APPLE_MAGIC_KEYBOARD_NUMPAD_2021		0x029f
+
+#define USB_VENDOR_ID_KEYCHRON	0x3434
+
+#define USB_HID_QUIRK_POLL_NO_REPORT_IDLE	BIT(0)
+
+/*
  * If overwrite_console returns 1, the stdin, stderr and stdout
  * are switched to the serial port, else the settings in the
  * environment are used
@@ -106,6 +118,8 @@ struct usb_kbd_pdata {
 	unsigned long	last_report;
 	struct int_queue *intq;
 
+	uint32_t	ifnum;
+
 	uint32_t	repeat_delay;
 
 	uint32_t	usb_in_pointer;
@@ -119,15 +133,6 @@ struct usb_kbd_pdata {
 };
 
 extern int __maybe_unused net_busy_flag;
-
-/*
- * Since we only support one usbkbd device in the iomux,
- * ignore common keyboard-emulating devices that aren't
- * real keyboards.
- */
-const uint16_t vid_blocklist[] = {
-	0x1050, /* Yubico */
-};
 
 /* The period of time between two calls of usb_kbd_testc(). */
 static unsigned long kbd_testc_tms;
@@ -159,8 +164,8 @@ static void usb_kbd_put_queue(struct usb_kbd_pdata *data, u8 c)
  */
 static void usb_kbd_setled(struct usb_device *dev)
 {
-	struct usb_interface *iface = &dev->config.if_desc[0];
 	struct usb_kbd_pdata *data = dev->privptr;
+	struct usb_interface *iface = &dev->config.if_desc[data->ifnum];
 	ALLOC_ALIGN_BUFFER(uint32_t, leds, 1, USB_DMA_MINALIGN);
 
 	*leds = data->flags & USB_KBD_LEDMASK;
@@ -374,7 +379,7 @@ static inline void usb_kbd_poll_for_event(struct usb_device *dev)
 #if defined(CONFIG_SYS_USB_EVENT_POLL_VIA_CONTROL_EP)
 	struct usb_interface *iface;
 	struct usb_kbd_pdata *data = dev->privptr;
-	iface = &dev->config.if_desc[0];
+	iface = &dev->config.if_desc[data->ifnum];
 	usb_get_report(dev, iface->desc.bInterfaceNumber,
 		       1, 0, data->new, USB_KBD_BOOT_REPORT_SIZE);
 	if (memcmp(data->old, data->new, USB_KBD_BOOT_REPORT_SIZE)) {
@@ -473,8 +478,8 @@ static int usb_kbd_probe_dev(struct usb_device *dev, unsigned int ifnum)
 	struct usb_interface *iface;
 	struct usb_endpoint_descriptor *ep;
 	struct usb_kbd_pdata *data;
+	unsigned int quirks = 0;
 	int epNum;
-	int i;
 
 	if (dev->descriptor.bNumConfigurations != 1)
 		return 0;
@@ -489,15 +494,6 @@ static int usb_kbd_probe_dev(struct usb_device *dev, unsigned int ifnum)
 
 	if (iface->desc.bInterfaceProtocol != USB_PROT_HID_KEYBOARD)
 		return 0;
-
-	for (i = 0; i < ARRAY_SIZE(vid_blocklist); i++) {
-		if (dev->descriptor.idVendor == vid_blocklist[i]) {
-			printf("Ignoring keyboard device 0x%x:0x%x\n",
-			       dev->descriptor.idVendor,
-			       dev->descriptor.idProduct);
-			return 0;
-		}
-	}
 
 	for (epNum = 0; epNum < iface->desc.bNumEndpoints; epNum++) {
 		ep = &iface->ep_desc[epNum];
@@ -515,6 +511,15 @@ static int usb_kbd_probe_dev(struct usb_device *dev, unsigned int ifnum)
 
 	debug("USB KBD: found interrupt EP: 0x%x\n", ep->bEndpointAddress);
 
+	switch (dev->descriptor.idVendor) {
+	case USB_VENDOR_ID_APPLE:
+	case USB_VENDOR_ID_KEYCHRON:
+		quirks |= USB_HID_QUIRK_POLL_NO_REPORT_IDLE;
+		break;
+	default:
+		break;
+	}
+
 	data = malloc(sizeof(struct usb_kbd_pdata));
 	if (!data) {
 		printf("USB KBD: Error allocating private data\n");
@@ -527,6 +532,8 @@ static int usb_kbd_probe_dev(struct usb_device *dev, unsigned int ifnum)
 	/* allocate input buffer aligned and sized to USB DMA alignment */
 	data->new = memalign(USB_DMA_MINALIGN,
 		roundup(USB_KBD_BOOT_REPORT_SIZE, USB_DMA_MINALIGN));
+
+	data->ifnum = ifnum;
 
 	/* Insert private data into USB device structure */
 	dev->privptr = data;
@@ -553,6 +560,14 @@ static int usb_kbd_probe_dev(struct usb_device *dev, unsigned int ifnum)
 	usb_set_idle(dev, iface->desc.bInterfaceNumber, 0, 0);
 #endif
 
+	/*
+	 * Apple and Keychron keyboards do not report the device state. Reports
+	 * are only returned during key presses.
+	 */
+	if (quirks & USB_HID_QUIRK_POLL_NO_REPORT_IDLE) {
+		debug("USB KBD: quirk: skip testing device state\n");
+		return 1;
+	}
 	debug("USB KBD: enable interrupt pipe...\n");
 #ifdef CONFIG_SYS_USB_EVENT_POLL_VIA_INT_QUEUE
 	data->intq = create_int_queue(dev, data->intpipe, 1,
@@ -580,10 +595,17 @@ static int probe_usb_keyboard(struct usb_device *dev)
 {
 	char *stdinname;
 	struct stdio_dev usb_kbd_dev;
+	unsigned int ifnum;
+	unsigned int max_ifnum = min((unsigned int)USB_MAX_ACTIVE_INTERFACES,
+				     (unsigned int)dev->config.no_of_if);
 	int error;
 
 	/* Try probing the keyboard */
-	if (usb_kbd_probe_dev(dev, 0) != 1)
+	for (ifnum = 0; ifnum < max_ifnum; ifnum++) {
+		if (usb_kbd_probe_dev(dev, ifnum) == 1)
+			break;
+	}
+	if (ifnum >= max_ifnum)
 		return -ENOENT;
 
 	/* Register the keyboard */
@@ -749,6 +771,18 @@ static const struct usb_device_id kbd_id_table[] = {
 		.bInterfaceClass = USB_CLASS_HID,
 		.bInterfaceSubClass = USB_SUB_HID_BOOT,
 		.bInterfaceProtocol = USB_PROT_HID_KEYBOARD,
+	},
+	{
+		USB_DEVICE(USB_VENDOR_ID_APPLE,
+			   USB_DEVICE_ID_APPLE_MAGIC_KEYBOARD_2021),
+	},
+	{
+		USB_DEVICE(USB_VENDOR_ID_APPLE,
+			   USB_DEVICE_ID_APPLE_MAGIC_KEYBOARD_FINGERPRINT_2021),
+	},
+	{
+		USB_DEVICE(USB_VENDOR_ID_APPLE,
+			   USB_DEVICE_ID_APPLE_MAGIC_KEYBOARD_NUMPAD_2021),
 	},
 	{ }		/* Terminating entry */
 };

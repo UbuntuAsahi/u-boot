@@ -34,6 +34,12 @@
 		apple,dcs-min-ps = <7>;
 	};
 
+	pmgr_dcp: power-management@28e3d0000 {
+		reg = <0x2 0x8e3d0000 0x0 0x4000>;
+		reg-names = "dcp-fw-pmgr";
+		#apple,bw-scratch-cells = <3>;
+	};
+
 	smc_mbox: mbox@290408000 {
 		compatible = "apple,t6000-asc-mailbox", "apple,asc-mailbox-v4";
 		reg = <0x2 0x90408000 0x0 0x4000>;
@@ -184,6 +190,7 @@
 		interrupts = <AIC_IRQ 0 821 IRQ_TYPE_LEVEL_HIGH>;
 		status = "disabled";
 		power-domains = <&ps_disp0_cpu0>;
+		apple,dma-range = <0x0 0x0 0x0 0xfc000000>;
 	};
 
 	dcp_dart: iommu@38b30c000 {
@@ -193,6 +200,7 @@
 		interrupt-parent = <&aic>;
 		interrupts = <AIC_IRQ 0 821 IRQ_TYPE_LEVEL_HIGH>;
 		power-domains = <&ps_disp0_cpu0>;
+		apple,dma-range = <0x1f0 0x0 0x0 0xfc000000>;
 	};
 
 	dcp_mbox: mbox@38bc08000 {
@@ -215,18 +223,16 @@
 		mbox-names = "mbox";
 		iommus = <&dcp_dart 0>;
 
-		reg-names = "coproc", "disp-0", "disp-1", "disp-2",
-			"disp-3", "disp-4";
+		reg-names = "coproc", "disp-0", "disp-1", "disp-2", "disp-3";
 		reg = <0x3 0x8bc00000 0x0 0x4000>,
 			<0x3 0x8a000000 0x0 0x3000000>,
 			<0x3 0x8b320000 0x0 0x4000>,
 			<0x3 0x8b344000 0x0 0x4000>,
-			<0x3 0x8b800000 0x0 0x800000>,
-			<0x2 0x8e3d0000 0x0 0x4000>;
+			<0x3 0x8b800000 0x0 0x800000>;
+		apple,bw-scratch = <&pmgr_dcp 0 4 0x988>;
 		power-domains = <&ps_disp0_cpu0>;
 		resets = <&ps_disp0_cpu0>;
 		clocks = <&clk_disp0>;
-		apple,asc-dram-mask = <0>;
 		phandle = <&dcp>;
 
 		disp0_piodma: piodma {
@@ -498,6 +504,55 @@
 		interrupt-names = "send-empty", "send-not-empty",
 			"recv-empty", "recv-not-empty";
 		#mbox-cells = <0>;
+	};
+
+	isp_dart0: iommu@3860e8000 {
+		compatible = "apple,t6000-dart";
+		reg = <0x3 0x860e8000 0x0 0x4000>;
+		#iommu-cells = <1>;
+		interrupt-parent = <&aic>;
+		interrupts = <AIC_IRQ 0 543 IRQ_TYPE_LEVEL_HIGH>;
+		power-domains = <&ps_isp_sys>;
+		status = "disabled";
+	};
+
+	isp_dart1: iommu@3860f4000 {
+		compatible = "apple,t6000-dart";
+		reg = <0x3 0x860f4000 0x0 0x4000>;
+		#iommu-cells = <1>;
+		interrupt-parent = <&aic>;
+		interrupts = <AIC_IRQ 0 543 IRQ_TYPE_LEVEL_HIGH>;
+		power-domains = <&ps_isp_sys>;
+		status = "disabled";
+	};
+
+	isp_dart2: iommu@3860fc000 {
+		compatible = "apple,t6000-dart";
+		reg = <0x3 0x860fc000 0x0 0x4000>;
+		#iommu-cells = <1>;
+		interrupt-parent = <&aic>;
+		interrupts = <AIC_IRQ 0 543 IRQ_TYPE_LEVEL_HIGH>;
+		power-domains = <&ps_isp_sys>;
+		status = "disabled";
+	};
+
+	isp: isp@384000000 {
+		compatible = "apple,t6000-isp", "apple,isp";
+		iommus = <&isp_dart0 0>, <&isp_dart1 0>, <&isp_dart2 0>;
+		reg-names = "coproc", "mbox", "gpio", "mbox2";
+		reg = <0x3 0x84000000 0x0 0x2000000>,
+			<0x3 0x86104000 0x0 0x100>,
+			<0x3 0x86104170 0x0 0x100>,
+			<0x3 0x861043f0 0x0 0x100>;
+		interrupt-parent = <&aic>;
+		interrupts = <AIC_IRQ 0 538 IRQ_TYPE_LEVEL_HIGH>;
+		power-domains = <&ps_isp_sys>, <&ps_isp_set0>,
+			<&ps_isp_set1>, <&ps_isp_fe>, <&ps_isp_set3>,
+			<&ps_isp_set4>, <&ps_isp_set5>, <&ps_isp_set6>,
+			<&ps_isp_set7>, <&ps_isp_set8>;
+		apple,dart-vm-size = <0x0 0xa0000000>;
+
+		status = "disabled";
 	};
 
 	pcie0_dart_0: iommu@581008000 {

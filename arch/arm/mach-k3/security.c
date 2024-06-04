@@ -2,12 +2,11 @@
 /*
  * K3: Security functions
  *
- * Copyright (C) 2018-2022 Texas Instruments Incorporated - http://www.ti.com/
+ * Copyright (C) 2018-2022 Texas Instruments Incorporated - https://www.ti.com/
  *	Andrew F. Davis <afd@ti.com>
  */
 
 #include <asm/io.h>
-#include <common.h>
 #include <cpu_func.h>
 #include <dm.h>
 #include <hang.h>
@@ -67,14 +66,6 @@ void ti_secure_image_check_binary(void **p_image, size_t *p_size)
 
 		return;
 	}
-
-	if (get_device_type() != K3_DEVICE_TYPE_HS_SE &&
-	    !ti_secure_cert_detected(*p_image)) {
-		printf("Warning: Did not detect image signing certificate. "
-		       "Skipping authentication to prevent boot failure. "
-		       "This will fail on Security Enforcing(HS-SE) devices\n");
-		return;
-	}
 }
 
 void ti_secure_image_post_process(void **p_image, size_t *p_size)
@@ -91,9 +82,16 @@ void ti_secure_image_post_process(void **p_image, size_t *p_size)
 		return;
 	}
 
-	if (get_device_type() != K3_DEVICE_TYPE_HS_SE &&
-	    get_device_type() != K3_DEVICE_TYPE_HS_FS)
+	if (get_device_type() == K3_DEVICE_TYPE_GP)
 		return;
+
+	if (get_device_type() != K3_DEVICE_TYPE_HS_SE &&
+	    !ti_secure_cert_detected(*p_image)) {
+		printf("Warning: Did not detect image signing certificate. "
+		       "Skipping authentication to prevent boot failure. "
+		       "This will fail on Security Enforcing(HS-SE) devices\n");
+		return;
+	}
 
 	/* Clean out image so it can be seen by system firmware */
 	image_addr = dma_map_single(*p_image, *p_size, DMA_BIDIRECTIONAL);

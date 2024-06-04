@@ -42,6 +42,11 @@
 	};
 
 	coreboot-fb {
+		bootph-some-ram;
 		compatible = "coreboot-fb";
+	};
+
+	sysinfo {
+		compatible = "coreboot,sysinfo";
 	};
 };

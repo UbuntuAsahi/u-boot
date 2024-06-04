@@ -18,6 +18,7 @@
 #include <linux/bitops.h>
 #include <linux/err.h>
 #include <linux/libfdt.h>
+#include <linux/printk.h>
 
 #include "../gpio/stm32_gpio_priv.h"
 
@@ -504,6 +505,8 @@ static const struct udevice_id stm32_pinctrl_ids[] = {
 	{ .compatible = "st,stm32mp157-pinctrl" },
 	{ .compatible = "st,stm32mp157-z-pinctrl" },
 	{ .compatible = "st,stm32mp135-pinctrl" },
+	{ .compatible = "st,stm32mp257-pinctrl" },
+	{ .compatible = "st,stm32mp257-z-pinctrl" },
 	{ }
 };
 

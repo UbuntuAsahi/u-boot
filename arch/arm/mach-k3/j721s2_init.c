@@ -2,11 +2,10 @@
 /*
  * J721E: SoC specific initialization
  *
- * Copyright (C) 2021 Texas Instruments Incorporated - http://www.ti.com/
+ * Copyright (C) 2021 Texas Instruments Incorporated - https://www.ti.com/
  *	David Huang <d-huang@ti.com>
  */
 
-#include <common.h>
 #include <init.h>
 #include <spl.h>
 #include <asm/io.h>
@@ -219,7 +218,7 @@ void k3_mem_init(void)
 	struct udevice *dev;
 	int ret;
 
-	if (IS_ENABLED(CONFIG_TARGET_J721S2_R5_EVM)) {
+	if (IS_ENABLED(CONFIG_K3_J721E_DDRSS)) {
 		ret = uclass_get_device_by_name(UCLASS_MISC, "msmc", &dev);
 		if (ret)
 			panic("Probe of msmc failed: %d\n", ret);
@@ -229,10 +228,10 @@ void k3_mem_init(void)
 			panic("DRAM 0 init failed: %d\n", ret);
 
 		ret = uclass_next_device_err(&dev);
-		if (ret)
+		if (ret && ret != -ENODEV)
 			panic("DRAM 1 init failed: %d\n", ret);
 	}
-	spl_enable_dcache();
+	spl_enable_cache();
 }
 
 /* Support for the various EVM / SK families */

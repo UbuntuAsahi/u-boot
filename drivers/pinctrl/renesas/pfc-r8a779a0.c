@@ -7,7 +7,6 @@
  * This file is based on the drivers/pinctrl/renesas/pfc-r8a7795.c
  */
 
-#include <common.h>
 #include <dm.h>
 #include <errno.h>
 #include <dm/pinctrl.h>
@@ -3633,7 +3632,7 @@ static const struct pinmux_cfg_reg pinmux_config_regs[] = {
 		MOD_SEL2_3_2
 		/* RESERVED 1-0 */ ))
 	},
-	{ },
+	{ /* sentinel */ }
 };
 
 static const struct pinmux_drive_reg pinmux_drive_regs[] = {
@@ -3938,7 +3937,7 @@ static const struct pinmux_drive_reg pinmux_drive_regs[] = {
 		{ RCAR_GP_PIN(9, 17),  4, 3 },	/* AVB5_LINK */
 		{ RCAR_GP_PIN(9, 16),  0, 3 },	/* AVB5_PHY_INT */
 	} },
-	{ },
+	{ /* sentinel */ }
 };
 
 enum ioctrl_regs {
@@ -3965,7 +3964,7 @@ static const struct pinmux_ioctrl_reg pinmux_ioctrl_regs[] = {
 	[POC8] = { 0xe60690a0, },
 	[POC9] = { 0xe60698a0, },
 	[TD1SEL0] = { 0xe6058124, },
-	{ /* sentinel */ },
+	{ /* sentinel */ }
 };
 
 static int r8a779a0_pin_to_pocctrl(unsigned int pin, u32 *pocctrl)
@@ -4352,7 +4351,7 @@ static const struct pinmux_bias_reg pinmux_bias_regs[] = {
 		[30] = SH_PFC_PIN_NONE,
 		[31] = SH_PFC_PIN_NONE,
 	} },
-	{ /* sentinel */ },
+	{ /* sentinel */ }
 };
 
 static const struct sh_pfc_soc_operations r8a779a0_pfc_ops = {

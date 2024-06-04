@@ -1,6 +1,9 @@
 .. SPDX-License-Identifier: GPL-2.0+
 .. Copyright 2022, Heinrich Schuchardt <xypron.glpk@gmx.de>
 
+.. index::
+   single: source (command)
+
 source command
 ==============
 
@@ -161,7 +164,7 @@ The boot scripts (boot.scr) is created with:
 
     mkimage -T script -n 'Test script' -d boot.txt boot.scr
 
-The script can be execute in U-boot like this:
+The script can be execute in U-Boot like this:
 
 .. code-block::
 
